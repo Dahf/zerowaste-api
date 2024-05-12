@@ -4,7 +4,7 @@ services:
     build: .
     container_name: zerowaste-api
     image: zerowaste-api
-    command: pm2-runtime index.js -i max
+    command: pm2-runtime app.js -i max
     volumes:
       - .:/usr/app/
       - /usr/app/node_modules
