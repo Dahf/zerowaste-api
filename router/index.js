@@ -33,7 +33,7 @@ router.get("/status", (request, response) => {
  router.post("/meal", verifyJWT, async (request, response) => {
     const { name, description, servingSize, calories, fat, carbohydrates, protein, fiber, sugar, sodium, ingredients } = request.body
     try {
-      // Erstellen einer neuen Mahlzeit
+
       const meal = await Meal.create({
         name,
         description,
@@ -46,7 +46,6 @@ router.get("/status", (request, response) => {
         sugar,
         sodium
       });
-  
       if (ingredients && ingredients.length) {
         for (const ingredient of ingredients) {
           const [ing, created] = await Ingredient.findOrCreate({
@@ -79,7 +78,21 @@ router.get("/status", (request, response) => {
     try {
         let foundItems;
 
+        
         if(ingredient){
+            const res = await fetch("https://translate.silasbeckmann.de/translate", {
+              method: "POST",
+              body: JSON.stringify({
+                q: ingredient,
+                source: "auto",
+                target: "en",
+                format: "text",
+                api_key: ""
+              }),
+              headers: { "Content-Type": "application/json" }
+            });
+            console.log(res.data)
+
             foundItems = await Meal.findAll({
                 include: [{ 
                     model: Ingredient,
