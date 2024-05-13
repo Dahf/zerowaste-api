@@ -8,6 +8,39 @@ const router = express.Router();
 
 const secretKey = process.env.KEY; 
 
+async function translateText(text, targetLang, sourceLang = 'auto') {
+  const response = await fetch("https://translate.silasbeckmann.de/translate", {
+      method: "POST",
+      body: JSON.stringify({
+          q: text,
+          source: sourceLang,
+          target: targetLang,
+          format: "text"
+      }),
+      headers: { "Content-Type": "application/json" }
+  });
+
+  const data = await response.json();
+  return data.translatedText;
+}
+
+async function translateObject(obj, targetLang) {
+  const keys = Object.keys(obj);
+  const translatedObj = {};
+  
+  for (const key of keys) {
+      if (typeof obj[key] === 'string') {
+          translatedObj[key] = await translateText(obj[key], targetLang);
+      } else if (typeof obj[key] === 'object' && obj[key] !== null) {
+          translatedObj[key] = await translateObject(obj[key], targetLang);
+      } else {
+          translatedObj[key] = obj[key];
+      }
+  }
+  
+  return translatedObj;
+}
+
 router.get("/status", (request, response) => {
     const status = {
        "Status": "Running"
@@ -72,52 +105,43 @@ router.get("/status", (request, response) => {
       res.status(500).send('Server error: ' + error.message);
     }
     
- });
- router.get('/meals', async (req, res) => {
-    const { ingredient } = req.query;
-    try {
-        let foundItems;
+ });router.get('/meals', async (req, res) => {
+  const { ingredient, lan } = req.query;
+  try {
+      let foundItems;
 
-        
-        if(ingredient){
-            const res = await fetch("https://translate.silasbeckmann.de/translate", {
-              method: "POST",
-              body: JSON.stringify({
-                q: ingredient,
-                source: "auto",
-                target: "en",
-                format: "text"
-              }),
-              headers: { "Content-Type": "application/json" }
-            });
-            
-            const data = await res.json();
-            console.log(data);
+      if (ingredient) {
+          const translatedIngredient = await translateText(ingredient, 'en');
+          foundItems = await Meal.findAll({
+              include: [{
+                  model: Ingredient,
+                  required: !!translatedIngredient,
+              }, {
+                  required: !!translatedIngredient,
+                  model: Ingredient,
+                  as: "tagFilter",
+                  where: { name: { [Op.iLike]: '%' + translatedIngredient + '%' } }
+              }],
+          });
+      } else {
+          foundItems = await Meal.findAll({
+              include: [{
+                  required: !!ingredient,
+                  model: Ingredient,
+              }],
+          });
+      }
 
-            foundItems = await Meal.findAll({
-                include: [{ 
-                    model: Ingredient,
-                    required: !!ingredient,
-                }, {
-                    required: !!ingredient,
-                    model: Ingredient,
-                    as: "tagFilter",
-                    where: { name: { [Op.iLike]: '%' + ingredient + '%' } }
-                }],
-            })
-        } else {
-            foundItems = await Meal.findAll({
-                include: [{
-                    required: !!ingredient,
-                    model: Ingredient,
-                }],
-            })
-        }
-        // Ergebnisse zurückgeben
-        res.json(foundItems);
-    } catch (error) {
-        res.status(500).send('Server error: ' + error.message);
-    }
+      // Wenn eine Zielsprache angegeben ist, übersetze die gesamte Antwort
+      if (lan && lan !== 'en') {
+          foundItems = await translateObject({ meals: foundItems }, lan);
+      }
+
+      // Ergebnisse zurückgeben
+      res.json(foundItems);
+  } catch (error) {
+      res.status(500).send('Server error: ' + error.message);
+  }
 });
 
 export default router;
