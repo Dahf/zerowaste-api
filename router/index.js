@@ -83,7 +83,7 @@ router.get("/status", (request, response) => {
             const res = await fetch("https://translate.silasbeckmann.de/translate", {
               method: "POST",
               body: JSON.stringify({
-                q: ingredient,
+                q: "Hallo mein Name ist Silas",
                 source: "auto",
                 target: "en",
                 format: "text"
