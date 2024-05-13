@@ -55,11 +55,11 @@ services:
     volumes:
        - pgadmin:/var/lib/pgadmin
     ports:
-      - "${PGADMIN_PORT:-5050}:5050"
+      - "${PGADMIN_PORT:-80}:80"
     labels:
       - traefik.enable=true
       - traefik.http.routers.pgadmin.entrypoints=web,websecure
-      - traefik.http.services.pgadmin.loadbalancer.server.port=5050
+      - traefik.http.services.pgadmin.loadbalancer.server.port=80
       - traefik.http.routers.pgadmin.rule=Host(`pgadmin.silasbeckmann.de`)
       - traefik.http.routers.pgadmin.tls=true
       - traefik.docker.network=traefik_proxy-net
