@@ -88,7 +88,7 @@ router.get("/status", (request, response) => {
                     required: !!ingredient,
                     model: Ingredient,
                     as: "tagFilter",
-                    where: { name: ingredient }
+                    where: { name: { [Op.iLike]: '%' + ingredient + '%' } }
                 }],
             })
         } else {
