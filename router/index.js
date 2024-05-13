@@ -3,7 +3,6 @@ import Meal from '../models/Meals.js'
 import Ingredient from "../models/Ingredient.js";
 import { Sequelize, Op } from "sequelize";
 import MealIngredient from "../models/MealIngredients.js";
-const fetch = require('node-fetch');
 
 const router = express.Router();
 
@@ -112,7 +111,7 @@ router.get("/status", (request, response) => {
     }
     
  });
- 
+
  router.get('/meals', async (req, res) => {
   const { ingredient, lan } = req.query;
   try {
