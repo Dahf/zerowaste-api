@@ -20,7 +20,7 @@ async function translateText(text, targetLang, sourceLang = 'auto') {
     });
 
     const data = await response.json();
-    return data.translatedText;
+    return data;
 }
 router.get("/status", (request, response) => {
     const status = {
