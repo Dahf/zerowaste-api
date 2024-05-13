@@ -95,7 +95,6 @@ router.get("/status", (request, response) => {
       if (ingredient) {
           // Zuerst das Ingredient ins Englische übersetzen
           const translatedIngredient = await translateText(ingredient, "en");
-          console.log(translatedIngredient);
           
           foundItems = await Meal.findAll({
               include: [{
