@@ -1,6 +1,9 @@
-const { DataTypes } = require("sequelize");
+import { Sequelize } from "sequelize";
+import db from "../config/Database.js";
+ 
+const { DataTypes } = Sequelize;
 
-const IngredientModel = {
+const IngredientModel = db.define('ingredient',{
   id: {
     type: DataTypes.INTEGER,
     autoIncrement: true,
@@ -13,12 +16,17 @@ const IngredientModel = {
   measure: {
     type: DataTypes.STRING,
     allowNull: false
+  },
+  quantity: {
+    type: DataTypes.STRING,
+    allowNull: false
   }
-};
+},{
+  freezeTableName:true
+});
 
-module.exports = {
-  initialise: (sequelize) => {
-    const Ingredient = sequelize.define("ingredient", IngredientModel);
-    return Ingredient;
-  }
-};
+(async () => {
+  await db.sync();
+})();
+
+export default IngredientModel;

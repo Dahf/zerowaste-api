@@ -1,6 +1,8 @@
-const { DataTypes } = require("sequelize");
+import { Sequelize } from "sequelize";
+import db from "../config/Database.js";
+const { DataTypes } = Sequelize;
 
-const MealModel = {
+const MealModel = db.define('meals',{
   id: {
     type: DataTypes.INTEGER,
     autoIncrement: true,
@@ -46,53 +48,12 @@ const MealModel = {
     type: DataTypes.INTEGER, // Milligramm Natrium
     allowNull: true
   },
-  createdAt: {
-    type: DataTypes.DATE,
-    defaultValue: DataTypes.NOW
-  },
-  updatedAt: {
-    type: DataTypes.DATE,
-    defaultValue: DataTypes.NOW
-  }
-};
+},{
+  freezeTableName:true
+});
 
-module.exports = {
-    initialise: (sequelize) => {
-        const Meal = sequelize.define("meal", MealModel);
-        const Ingredient = require('./Ingredient').initialise(sequelize);
+(async () => {
+  await db.sync();
+})();
 
-        // Definieren der 1-zu-n-Beziehung
-        Meal.hasMany(Ingredient, { as: 'ingredients' });
-        Ingredient.belongsTo(Meal, { foreignKey: 'mealId', as: 'meal' });
-
-        return Meal;
-    },
-
-  createMeal: (meal) => {
-    return this.model.create(meal);
-  },
-
-  findMeal: (query) => {
-    return this.model.findOne({
-      where: query,
-    });
-  },
-
-  updateMeal: (query, updatedValue) => {
-    return this.model.update(updatedValue, {
-      where: query,
-    });
-  },
-
-  findAllMeals: (query) => {
-    return this.model.findAll({
-      where: query
-    });
-  },
-
-  deleteMeal: (query) => {
-    return this.model.destroy({
-      where: query
-    });
-  }
-};
+export default MealModel;
