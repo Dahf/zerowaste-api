@@ -7,54 +7,21 @@ import MealIngredient from "../models/MealIngredients.js";
 const router = express.Router();
 
 const secretKey = process.env.KEY; 
-
 async function translateText(text, targetLang, sourceLang = 'auto') {
-  const response = await fetch("https://translate.silasbeckmann.de/translate", {
-      method: "POST",
-      body: JSON.stringify({
-          q: Array.isArray(text) ? text.join('\n') : text,
-          source: sourceLang,
-          target: targetLang,
-          format: "text"
-      }),
-      headers: { "Content-Type": "application/json" }
-  });
+    const response = await fetch("https://translate.silasbeckmann.de/translate", {
+        method: "POST",
+        body: JSON.stringify({
+            q: text,
+            source: sourceLang,
+            target: targetLang,
+            format: "text"
+        }),
+        headers: { "Content-Type": "application/json" }
+    });
 
-  const data = await response.json();
-  return Array.isArray(text) ? data.translatedText.split('\n') : data.translatedText;
+    const data = await response.json();
+    return data.translatedText;
 }
-
-async function translateApiResponse(response, targetLang) {
-  const stringsToTranslate = [];
-  const stringPaths = [];
-
-  function extractStrings(obj, path = []) {
-      for (const key in obj) {
-          if (typeof obj[key] === 'string') {
-              stringsToTranslate.push(obj[key]);
-              stringPaths.push([...path, key]);
-          } else if (typeof obj[key] === 'object' && obj[key] !== null) {
-              extractStrings(obj[key], [...path, key]);
-          }
-      }
-  }
-
-  extractStrings(response);
-
-  const translatedStrings = await translateText(stringsToTranslate, targetLang);
-
-  translatedStrings.forEach((translatedString, index) => {
-      let current = response;
-      const path = stringPaths[index];
-      for (let i = 0; i < path.length - 1; i++) {
-          current = current[path[i]];
-      }
-      current[path[path.length - 1]] = translatedString;
-  });
-
-  return response;
-}
-
 router.get("/status", (request, response) => {
     const status = {
        "Status": "Running"
@@ -120,23 +87,24 @@ router.get("/status", (request, response) => {
     }
     
  });
-
  router.get('/meals', async (req, res) => {
   const { ingredient, lan } = req.query;
   try {
       let foundItems;
 
       if (ingredient) {
-          const translatedIngredient = await translateText([ingredient], 'en');
+          // Zuerst das Ingredient ins Englische übersetzen
+          const translatedIngredient = translateText(ingredient, "en");
+
           foundItems = await Meal.findAll({
               include: [{
                   model: Ingredient,
-                  required: !!translatedIngredient[0],
+                  required: !!translatedIngredient,
               }, {
-                  required: !!translatedIngredient[0],
+                  required: !!translatedIngredient,
                   model: Ingredient,
                   as: "tagFilter",
-                  where: { name: { [Op.iLike]: '%' + translatedIngredient[0] + '%' } }
+                  where: { name: { [Op.iLike]: '%' + translatedIngredient + '%' } }
               }],
           });
       } else {
@@ -147,12 +115,6 @@ router.get("/status", (request, response) => {
               }],
           });
       }
-
-      // Wenn eine Zielsprache angegeben ist, übersetze die gesamte Antwort
-      if (lan && lan !== 'en') {
-          foundItems = await translateApiResponse({ meals: foundItems }, lan);
-      }
-
       // Ergebnisse zurückgeben
       res.json(foundItems);
   } catch (error) {
