@@ -21,6 +21,13 @@ services:
     networks:
       - postgres
     hostname: "0.0.0.0" 
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.homeassistant.entrypoints=web,websecure
+      - traefik.http.services.homeassistant.loadbalancer.server.port=8123
+      - traefik.http.routers.homeassistant.rule=Host(silasbeckmann.de)
+      - traefik.http.routers.homeassistant.tls=true
+
 
   postgres:
     container_name: postgres_container
@@ -55,6 +62,8 @@ services:
 networks:
   postgres:
     driver: bridge
+  traefik_default:
+    external: true
 volumes:
     postgres:
     pgadmin:
