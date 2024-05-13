@@ -3,6 +3,7 @@ import Meal from '../models/Meals.js'
 import Ingredient from "../models/Ingredient.js";
 import { Sequelize, Op } from "sequelize";
 import MealIngredient from "../models/MealIngredients.js";
+const fetch = require('node-fetch');
 
 const router = express.Router();
 
@@ -25,19 +26,24 @@ async function translateText(text, targetLang, sourceLang = 'auto') {
 }
 
 async function translateObject(obj, targetLang) {
-  const keys = Object.keys(obj);
   const translatedObj = {};
-  
-  for (const key of keys) {
-      if (typeof obj[key] === 'string') {
-          translatedObj[key] = await translateText(obj[key], targetLang);
-      } else if (typeof obj[key] === 'object' && obj[key] !== null) {
-          translatedObj[key] = await translateObject(obj[key], targetLang);
-      } else {
-          translatedObj[key] = obj[key];
+
+  for (const key in obj) {
+      if (obj.hasOwnProperty(key)) {
+          if (typeof obj[key] === 'string') {
+              translatedObj[key] = await translateText(obj[key], targetLang);
+          } else if (Array.isArray(obj[key])) {
+              translatedObj[key] = await Promise.all(obj[key].map(item => 
+                  typeof item === 'object' && item !== null ? translateObject(item, targetLang) : item
+              ));
+          } else if (typeof obj[key] === 'object' && obj[key] !== null) {
+              translatedObj[key] = await translateObject(obj[key], targetLang);
+          } else {
+              translatedObj[key] = obj[key];
+          }
       }
   }
-  
+
   return translatedObj;
 }
 
@@ -105,7 +111,9 @@ router.get("/status", (request, response) => {
       res.status(500).send('Server error: ' + error.message);
     }
     
- });router.get('/meals', async (req, res) => {
+ });
+ 
+ router.get('/meals', async (req, res) => {
   const { ingredient, lan } = req.query;
   try {
       let foundItems;

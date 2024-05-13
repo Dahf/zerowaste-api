@@ -45,7 +45,7 @@ async function createMealWithIngredients() {
   console.log('Meal and Ingredients added');
 }
 
-createMealWithIngredients();
+//createMealWithIngredients();
 
 app.listen(PORT, () => {
     console.log("Server Listening on PORT:", PORT);
