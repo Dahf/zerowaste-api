@@ -86,11 +86,11 @@ router.get("/status", (request, response) => {
                 q: ingredient,
                 source: "auto",
                 target: "en",
-                format: "text",
+                format: "text"
               }),
               headers: { "Content-Type": "application/json" }
             });
-            console.log(res.data)
+            console.log(res)
 
             foundItems = await Meal.findAll({
                 include: [{ 
