@@ -28,6 +28,7 @@ services:
       - traefik.http.services.api.loadbalancer.server.port=8088
       - traefik.http.routers.api.rule=Host(`api.silasbeckmann.de`)
       - traefik.http.routers.api.tls=true
+      - traefik.docker.network=traefik_proxy-net
   postgres:
     container_name: postgres_container
     image: postgres
@@ -61,6 +62,7 @@ services:
       - traefik.http.services.pgadmin.loadbalancer.server.port=5050
       - traefik.http.routers.pgadmin.rule=Host(`pgadmin.silasbeckmann.de`)
       - traefik.http.routers.pgadmin.tls=true
+      - traefik.docker.network=traefik_proxy-net
     networks:
       - postgres
       - traefik_proxy-net
