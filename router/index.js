@@ -8,11 +8,11 @@ const router = express.Router();
 
 const secretKey = process.env.KEY; 
 
-async function translateText(text, targetLang, sourceLang = 'auto') {
+async function translateText(texts, targetLang, sourceLang = 'auto') {
   const response = await fetch("https://translate.silasbeckmann.de/translate", {
       method: "POST",
       body: JSON.stringify({
-          q: text,
+          q: texts,
           source: sourceLang,
           target: targetLang,
           format: "text"
@@ -21,29 +21,41 @@ async function translateText(text, targetLang, sourceLang = 'auto') {
   });
 
   const data = await response.json();
-  return data.translatedText;
+  return data.map(item => item.translatedText);
 }
 
-async function translateObject(obj, targetLang) {
-  const translatedObj = {};
 
-  for (const key in obj) {
-      if (obj.hasOwnProperty(key)) {
+async function translateObject(obj, targetLang) {
+  const itemsToTranslate = [];
+  const paths = [];
+
+  function extractStringsToTranslate(obj, path = []) {
+      for (const key in obj) {
           if (typeof obj[key] === 'string') {
-              translatedObj[key] = await translateText(obj[key], targetLang);
+              itemsToTranslate.push(obj[key]);
+              paths.push([...path, key]);
           } else if (Array.isArray(obj[key])) {
-              translatedObj[key] = await Promise.all(obj[key].map(item => 
-                  typeof item === 'object' && item !== null ? translateObject(item, targetLang) : item
-              ));
+              obj[key].forEach((item, index) => extractStringsToTranslate(item, [...path, key, index]));
           } else if (typeof obj[key] === 'object' && obj[key] !== null) {
-              translatedObj[key] = await translateObject(obj[key], targetLang);
-          } else {
-              translatedObj[key] = obj[key];
+              extractStringsToTranslate(obj[key], [...path, key]);
           }
       }
   }
 
-  return translatedObj;
+  extractStringsToTranslate(obj);
+
+  const translatedTexts = await translateText(itemsToTranslate, targetLang);
+
+  translatedTexts.forEach((translatedText, index) => {
+      let current = obj;
+      const path = paths[index];
+      for (let i = 0; i < path.length - 1; i++) {
+          current = current[path[i]];
+      }
+      current[path[path.length - 1]] = translatedText;
+  });
+
+  return obj;
 }
 
 router.get("/status", (request, response) => {
@@ -118,16 +130,16 @@ router.get("/status", (request, response) => {
       let foundItems;
 
       if (ingredient) {
-          const translatedIngredient = await translateText(ingredient, 'en');
+          const translatedIngredient = await translateText([ingredient], 'en');
           foundItems = await Meal.findAll({
               include: [{
                   model: Ingredient,
-                  required: !!translatedIngredient,
+                  required: !!translatedIngredient[0],
               }, {
-                  required: !!translatedIngredient,
+                  required: !!translatedIngredient[0],
                   model: Ingredient,
                   as: "tagFilter",
-                  where: { name: { [Op.iLike]: '%' + translatedIngredient + '%' } }
+                  where: { name: { [Op.iLike]: '%' + translatedIngredient[0] + '%' } }
               }],
           });
       } else {
@@ -141,7 +153,9 @@ router.get("/status", (request, response) => {
 
       // Wenn eine Zielsprache angegeben ist, übersetze die gesamte Antwort
       if (lan && lan !== 'en') {
-          foundItems = await translateObject({ meals: foundItems }, lan);
+          const responseObject = { meals: foundItems };
+          await translateObject(responseObject, lan);
+          foundItems = responseObject.meals;
       }
 
       // Ergebnisse zurückgeben
