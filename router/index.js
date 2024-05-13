@@ -20,7 +20,7 @@ async function translateText(text, targetLang, sourceLang = 'auto') {
     });
 
     const data = await response.json();
-    return data;
+    return data.translatedText;
 }
 router.get("/status", (request, response) => {
     const status = {
@@ -96,6 +96,7 @@ router.get("/status", (request, response) => {
           // Zuerst das Ingredient ins Englische übersetzen
           const translatedIngredient = translateText(ingredient, "en");
           console.log(translatedIngredient);
+          console.log("test123");
           foundItems = await Meal.findAll({
               include: [{
                   model: Ingredient,
