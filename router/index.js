@@ -90,7 +90,9 @@ router.get("/status", (request, response) => {
               }),
               headers: { "Content-Type": "application/json" }
             });
-            console.log(res.data)
+            
+            const data = await res.json();
+            console.log(data);
 
             foundItems = await Meal.findAll({
                 include: [{ 
