@@ -19,8 +19,6 @@ services:
     tty: true
     restart: unless-stopped
     network_mode: "host"
-    networks:
-      - postgres
     hostname: "0.0.0.0" 
     labels:
       - traefik.enable=true
