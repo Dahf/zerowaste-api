@@ -24,7 +24,7 @@ services:
     labels:
       - traefik.enable=true
       - traefik.http.routers.homeassistant.entrypoints=web,websecure
-      - traefik.http.services.homeassistant.loadbalancer.server.port=8123
+      - traefik.http.services.homeassistant.loadbalancer.server.port=8088
       - traefik.http.routers.homeassistant.rule=Host(silasbeckmann.de)
       - traefik.http.routers.homeassistant.tls=true
 
