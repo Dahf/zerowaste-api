@@ -8,11 +8,11 @@ const router = express.Router();
 
 const secretKey = process.env.KEY; 
 
-async function translateText(texts, targetLang, sourceLang = 'auto') {
+async function translateText(text, targetLang, sourceLang = 'auto') {
   const response = await fetch("https://translate.silasbeckmann.de/translate", {
       method: "POST",
       body: JSON.stringify({
-          q: texts,
+          q: Array.isArray(text) ? text.join('\n') : text,
           source: sourceLang,
           target: targetLang,
           format: "text"
@@ -21,41 +21,38 @@ async function translateText(texts, targetLang, sourceLang = 'auto') {
   });
 
   const data = await response.json();
-  return data.map(item => item.translatedText);
+  return Array.isArray(text) ? data.translatedText.split('\n') : data.translatedText;
 }
 
+async function translateApiResponse(response, targetLang) {
+  const stringsToTranslate = [];
+  const stringPaths = [];
 
-async function translateObject(obj, targetLang) {
-  const itemsToTranslate = [];
-  const paths = [];
-
-  function extractStringsToTranslate(obj, path = []) {
+  function extractStrings(obj, path = []) {
       for (const key in obj) {
           if (typeof obj[key] === 'string') {
-              itemsToTranslate.push(obj[key]);
-              paths.push([...path, key]);
-          } else if (Array.isArray(obj[key])) {
-              obj[key].forEach((item, index) => extractStringsToTranslate(item, [...path, key, index]));
+              stringsToTranslate.push(obj[key]);
+              stringPaths.push([...path, key]);
           } else if (typeof obj[key] === 'object' && obj[key] !== null) {
-              extractStringsToTranslate(obj[key], [...path, key]);
+              extractStrings(obj[key], [...path, key]);
           }
       }
   }
 
-  extractStringsToTranslate(obj);
+  extractStrings(response);
 
-  const translatedTexts = await translateText(itemsToTranslate, targetLang);
+  const translatedStrings = await translateText(stringsToTranslate, targetLang);
 
-  translatedTexts.forEach((translatedText, index) => {
-      let current = obj;
-      const path = paths[index];
+  translatedStrings.forEach((translatedString, index) => {
+      let current = response;
+      const path = stringPaths[index];
       for (let i = 0; i < path.length - 1; i++) {
           current = current[path[i]];
       }
-      current[path[path.length - 1]] = translatedText;
+      current[path[path.length - 1]] = translatedString;
   });
 
-  return obj;
+  return response;
 }
 
 router.get("/status", (request, response) => {
@@ -153,9 +150,7 @@ router.get("/status", (request, response) => {
 
       // Wenn eine Zielsprache angegeben ist, übersetze die gesamte Antwort
       if (lan && lan !== 'en') {
-          const responseObject = { meals: foundItems };
-          await translateObject(responseObject, lan);
-          foundItems = responseObject.meals;
+          foundItems = await translateApiResponse({ meals: foundItems }, lan);
       }
 
       // Ergebnisse zurückgeben
