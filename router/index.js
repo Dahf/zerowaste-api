@@ -87,7 +87,6 @@ router.get("/status", (request, response) => {
                 source: "auto",
                 target: "en",
                 format: "text",
-                api_key: ""
               }),
               headers: { "Content-Type": "application/json" }
             });
