@@ -1,8 +1,7 @@
 import { Sequelize } from "sequelize";
 import pg from "pg"
 
-const db = new Sequelize('postgres', "postgres", "changeme", {
-    host: "postgres_container",
+const db = new Sequelize(process.env.DATABASE_URL, {
     dialect: "postgres",
     port: 5432,
     dialectModule: pg,
