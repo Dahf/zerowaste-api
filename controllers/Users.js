@@ -1,9 +1,6 @@
 import Users from "../models/UserModel.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import {templates} from "../email/email.templates.js";
-import {sendEmail} from "../email/email.send.js";
-import {msgs} from "../email/email.msgs.js";
 
 export const getUsers = async(req, res) => {
     try {
