@@ -33,8 +33,6 @@ services:
       - "traefik.http.routers.api.rule=Host(`api.silasbeckmann.de`) && PathPrefix(`/api`)"
       - traefik.http.routers.api.tls=true
       - traefik.docker.network=traefik_proxy-net
-      - "traefik.http.middlewares.rewrite-api.stripprefix.prefixes=/api"
-      - "traefik.http.routers.api.middlewares=rewrite-api@docker"
   postgres:
     container_name: postgres_container
     image: postgres
