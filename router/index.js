@@ -102,29 +102,30 @@ router.get("/status", (request, response) => {
         ingredientsArray.map(async ing => await translateText(ing, "en"))
       );
 
-      // Bedingungen für jede übersetzte Zutat erstellen
-      const ingredientConditions = translatedIngredients.map(translatedIngredient => ({
-        name: { [Op.iLike]: '%' + translatedIngredient + '%' }
-      }));
-
+      // Suche nach Mahlzeiten, die alle übersetzten Zutaten enthalten
       foundItems = await Meal.findAll({
         include: [{
           model: Ingredient,
-          required: !!translatedIngredients.length,
-        }, {
-          required: !!translatedIngredients.length,
-          model: Ingredient,
-          as: "tagFilter",
+          required: true,
           where: {
-            [Op.and]: ingredientConditions
+            name: {
+              [Op.in]: translatedIngredients
+            }
           }
-        }],
+        }]
       });
+
+      // Nach Mahlzeiten filtern, die alle Zutaten enthalten
+      foundItems = foundItems.filter(meal => {
+        const ingredientNames = meal.Ingredients.map(ingredient => ingredient.name.toLowerCase());
+        return translatedIngredients.every(translatedIngredient => ingredientNames.includes(translatedIngredient.toLowerCase()));
+      });
+
     } else {
       foundItems = await Meal.findAll({
         include: [{
-          required: !!ingredient,
           model: Ingredient,
+          required: false,
         }],
       });
     }
