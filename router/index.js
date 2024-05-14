@@ -91,36 +91,48 @@ router.get("/status", (request, response) => {
  router.get('/meals', async (req, res) => {
   const { ingredient, lan } = req.query;
   try {
-      let foundItems;
+    let foundItems;
 
-      if (ingredient) {
-          // Zuerst das Ingredient ins Englische übersetzen
-          const translatedIngredient = await translateText(ingredient, "en");
-          
-          foundItems = await Meal.findAll({
-              include: [{
-                  model: Ingredient,
-                  required: !!translatedIngredient,
-              }, {
-                  required: !!translatedIngredient,
-                  model: Ingredient,
-                  as: "tagFilter",
-                  where: { name: { [Op.iLike]: '%' + translatedIngredient + '%' } }
-              }],
-          });
-      } else {
-          foundItems = await Meal.findAll({
-              include: [{
-                  required: !!ingredient,
-                  model: Ingredient,
-              }],
-          });
-      }
-      // Ergebnisse zurückgeben
-      res.json(foundItems);
+    if (ingredient) {
+      // Zutaten in ein Array aufteilen
+      const ingredientsArray = ingredient.split(',').map(ing => ing.trim());
+      
+      // Zutaten übersetzen und in ein neues Array speichern
+      const translatedIngredients = await Promise.all(
+        ingredientsArray.map(async ing => await translateText(ing, "en"))
+      );
+
+      // Bedingungen für jede übersetzte Zutat erstellen
+      const ingredientConditions = translatedIngredients.map(translatedIngredient => ({
+        name: { [Op.iLike]: '%' + translatedIngredient + '%' }
+      }));
+
+      foundItems = await Meal.findAll({
+        include: [{
+          model: Ingredient,
+          required: !!translatedIngredients.length,
+        }, {
+          required: !!translatedIngredients.length,
+          model: Ingredient,
+          as: "tagFilter",
+          where: {
+            [Op.and]: ingredientConditions
+          }
+        }],
+      });
+    } else {
+      foundItems = await Meal.findAll({
+        include: [{
+          required: !!ingredient,
+          model: Ingredient,
+        }],
+      });
+    }
+    
+    // Ergebnisse zurückgeben
+    res.json(foundItems);
   } catch (error) {
-      res.status(500).send('Server error: ' + error.message);
+    res.status(500).send('Server error: ' + error.message);
   }
 });
-
 export default router;
