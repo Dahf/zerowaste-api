@@ -31,8 +31,6 @@ services:
       - traefik.http.routers.api.rule=Host(`api.silasbeckmann.de`)
       - traefik.http.routers.api.tls=true
       - traefik.docker.network=traefik_proxy-net
-      - "traefik.http.middlewares.cors.headers.customResponseHeaders.Access-Control-Allow-Origin=https://silasbeckmann.de/"
-      - "traefik.http.routers.api.middlewares=cors"
 
   postgres:
     container_name: postgres_container

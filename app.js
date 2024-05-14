@@ -14,7 +14,6 @@ const app = express();
 
 app.use(bodyParser.json({limit: '100mb'}));
 app.use(bodyParser.urlencoded({limit: '100mb', extended: true}));
-app.use(cors({ credentials:true, origin:['https://silasbeckmann.de/', 'http://87.106.230.45/', 'https://zerowaste-frontend:5005'] }));
 
 app.use(cookieParser());
 app.use(express.json());
