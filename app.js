@@ -7,10 +7,10 @@ import router from "./router/index.js";
 import MealIngredient from "./models/MealIngredients.js";
 import cookieParser from "cookie-parser";
 import bodyParser from "body-parser";
+import cors from "cors";
 
 dotenv.config();
 const app = express();
-
 
 app.use(bodyParser.json({limit: '100mb'}));
 app.use(bodyParser.urlencoded({limit: '100mb', extended: true}));
