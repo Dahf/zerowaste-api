@@ -23,7 +23,9 @@ services:
       - postgres
       - bridge
       - traefik_proxy-net
-    hostname: "0.0.0.0" 
+    hostname: "0.0.0.0"
+    ports:
+      - "8088:8088" 
     labels:
       - traefik.enable=true
       - traefik.http.routers.api.entrypoints=web,websecure
