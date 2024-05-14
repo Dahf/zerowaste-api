@@ -5,9 +5,18 @@ import Meal from './models/Meals.js'
 import Ingredient from "./models/Ingredient.js";
 import router from "./router/index.js";
 import MealIngredient from "./models/MealIngredients.js";
+import cookieParser from "cookie-parser";
+import bodyParser from "body-parser";
 
 dotenv.config();
 const app = express();
+
+
+app.use(bodyParser.json({limit: '100mb'}));
+app.use(bodyParser.urlencoded({limit: '100mb', extended: true}));
+app.use(cors({ credentials:true, origin:'https://silasbeckmann.de' }));
+
+app.use(cookieParser());
 app.use(express.json());
 
 Meal.belongsToMany(Ingredient, { 
