@@ -107,7 +107,9 @@ router.get("/status", (request, response) => {
         name: { [Op.iLike]: '%' + translatedIngredient + '%' }
       }));
 
-      console.log(ingredientConditions)
+      console.log({
+        [Op.and]: ingredientConditions
+      })
 
       foundItems = await Meal.findAll({
         include: [{
