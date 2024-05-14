@@ -13,6 +13,7 @@ services:
     environment:
       DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-changeme}@postgres:5432/${POSTGRES_DB:-postgres}
       KEY: ${KEY}
+      TRANSLATE_API_KEY: ${TRANSLATE_API_KEY}
     stdin_open: true
     tty: true
     restart: unless-stopped

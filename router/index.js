@@ -2,7 +2,6 @@ import express from "express";
 import Meal from '../models/Meals.js'
 import Ingredient from "../models/Ingredient.js";
 import { Sequelize, Op } from "sequelize";
-import MealIngredient from "../models/MealIngredients.js";
 
 const router = express.Router();
 
@@ -14,7 +13,9 @@ async function translateText(text, targetLang, sourceLang = 'auto') {
             q: text,
             source: sourceLang,
             target: targetLang,
-            format: "text"
+            format: "text",
+            api_key: process.env.TRANSLATE_API_KEY
+
         }),
         headers: { "Content-Type": "application/json" }
     });
