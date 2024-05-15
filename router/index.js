@@ -1,6 +1,6 @@
 import express from "express";
 import { verifyToken, verifyTokenAdmin } from "../middleware/VerifyToken.js";
-import { createMeal, getMeal } from "../controllers/Meals.js";
+import { getMeal } from "../controllers/Meals.js";
 import { Login, Logout, Register } from "../controllers/Users.js";
 import { refreshToken } from "../controllers/RefreshToken.js";
 
