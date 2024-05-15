@@ -43,55 +43,62 @@ app.use('/uploads', express.static(uploadPath));
 app.post('/meal', upload.single('image'), async (req, res) => {
   const file = req.file;
   const body = req.body;
-
-  if (!file) {
-      return res.status(400).send('Keine Datei hochgeladen');
-  }
-  const publicUrl = `${req.protocol}://silasbeckmann.de/api/uploads/${file.filename}`;
-
-  const formData = {};
-  for (const key in body) {
-      formData[key] = body[key];
-  }
-  console.log(formData);
-
-  const meal = await Meal.create({
-    name: formData.name,
-    description: formData.description,
-    servingSize: formData.servingSize,
-    calories: formData.calories,
-    fat: formData.fat,
-    carbohydrates: formData.carbohydrates,
-    protein: formData.protein,
-    fiber: formData.fiber,
-    sugar: formData.sugar,
-    sodium: formData.sodium,
-    image: publicUrl
-  });
-  
-  if (formData.ingredients && formData.ingredients.length) {
-    for (const ingredient of formData.ingredients) {
-      console.log("ing:" + ingredient)
-      const ing = await Ingredient.create({ name: ingredient.name, measure: ingredient.measure, quantity: ingredient.quantity });
-
-      await meal.addIngredient(ing, { through: { quantity: ingredient.quantity } });
+  try {
+    if (!file) {
+        return res.status(400).send('Keine Datei hochgeladen');
     }
-  }
+    const publicUrl = `${req.protocol}://silasbeckmann.de/api/uploads/${file.filename}`;
 
-  // Antwort mit der erstellten Mahlzeit und ihren Zutaten
-  const result = await Meal.findByPk(meal.id, {
-    include: {
-      model: Ingredient,
-      through: {
-        model: MealIngredient
+    const formData = {};
+    for (const key in body) {
+        formData[key] = body[key];
+    }
+    console.log(formData);
+
+    const meal = await Meal.create({
+      name: formData.name,
+      description: formData.description,
+      servingSize: formData.servingSize,
+      calories: formData.calories,
+      fat: formData.fat,
+      carbohydrates: formData.carbohydrates,
+      protein: formData.protein,
+      fiber: formData.fiber,
+      sugar: formData.sugar,
+      sodium: formData.sodium,
+      image: publicUrl
+    });
+    
+    if (formData.ingredients && formData.ingredients.length) {
+      for (const ingredient of formData.ingredients) {
+        console.log("ing:" + ingredient)
+        const ing = await Ingredient.create({ name: ingredient.name, measure: ingredient.measure, quantity: ingredient.quantity });
+
+        await meal.addIngredient(ing, { through: { quantity: ingredient.quantity } });
       }
     }
-  });
-  console.log("results:" + result);
-  
-  res.status(200).json(result);
-});
 
+    // Antwort mit der erstellten Mahlzeit und ihren Zutaten
+    const result = await Meal.findByPk(meal.id, {
+      include: {
+        model: Ingredient,
+        through: {
+          model: MealIngredient
+        }
+      }
+    });
+    console.log("results:" + result);
+    
+    res.status(200).json(result);
+  } catch (error) {
+    console.error('Error creating meal:', error);
+    res.status(500).json({ error: 'Failed to create meal' });
+  }
+});
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('Unhandled Rejection at:', promise, 'reason:', reason);
+  // Handle logging or cleanup tasks
+});
 const corsOptions = {
   origin: 'https://silasbeckmann.de', // Domain des Frontends
   optionsSuccessStatus: 200,
