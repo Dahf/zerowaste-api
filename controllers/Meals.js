@@ -22,44 +22,39 @@ async function translateText(text, targetLang, sourceLang = 'auto') {
 }
 
 export const createMeal = async(request, response) => {
-    const { name, image, description, servingSize, calories, fat, carbohydrates, protein, fiber, sugar, sodium, ingredients } = request.body
-    console.log(request.body);
-    try {
-      
-      const meal = await Meal.create({
-        name,
-        image,
-        description,
-        servingSize,
-        calories,
-        fat,
-        carbohydrates,
-        protein,
-        fiber,
-        sugar,
-        sodium
-      });
-      if (ingredients && ingredients.length) {
-        for (const ingredient of ingredients) {
-          const ing = await Ingredient.create({ name: ingredient.name, measure: ingredient.measure, quantity: ingredient.quantity });
-          // Verbinden der Zutat mit der Mahlzeit mit zusätzlichen Mengenangaben
-          await meal.addIngredient(ing, { through: { quantity: ingredient.quantity } });
+  const { name, image, description, servingSize, calories, fat, carbohydrates, protein, fiber, sugar, sodium, ingredients } = request.body
+  console.log(request.body);
+    const meal = await Meal.create({
+      name,
+      image,
+      description,
+      servingSize,
+      calories,
+      fat,
+      carbohydrates,
+      protein,
+      fiber,
+      sugar,
+      sodium
+    });
+    if (ingredients && ingredients.length) {
+      for (const ingredient of ingredients) {
+        const ing = await Ingredient.create({ name: ingredient.name, measure: ingredient.measure, quantity: ingredient.quantity });
+        // Verbinden der Zutat mit der Mahlzeit mit zusätzlichen Mengenangaben
+        await meal.addIngredient(ing, { through: { quantity: ingredient.quantity } });
+      }
+    }
+
+    // Antwort mit der erstellten Mahlzeit und ihren Zutaten
+    const result = await Meal.findByPk(meal.id, {
+      include: {
+        model: Ingredient,
+        through: {
+          model: MealIngredient
         }
       }
-  
-      // Antwort mit der erstellten Mahlzeit und ihren Zutaten
-      const result = await Meal.findByPk(meal.id, {
-        include: {
-          model: Ingredient,
-          through: {
-            model: MealIngredient
-          }
-        }
-      });
-      response.status(201).json(result);
-    } catch (error) {
-      response.status(500).send('Server error: ' + error.message);
-    }
+    });
+    response.status(201).json(result);
 }
 
 export const getMeal = async(req, res) => {
