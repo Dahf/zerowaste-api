@@ -15,6 +15,7 @@ export const verifyToken = (req, res, next) => {
 export const verifyTokenAdmin = (req, res, next) => {
     const authHeader = req.headers['authorization'];
     const token = authHeader && authHeader.split(' ')[1];
+    console.log(token)
     if(token == null) return res.sendStatus(401);
     jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, async (err, decoded) => {
         if (err) { console.log(err); return res.sendStatus(403); }
@@ -24,7 +25,6 @@ export const verifyTokenAdmin = (req, res, next) => {
                 email: decoded.email
             }
         });
-        console.log(user)
         const rank = user[0].rank;
         if(rank == 0) return res.sendStatus(401);
         next();
