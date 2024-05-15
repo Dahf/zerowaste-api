@@ -16,6 +16,17 @@ import { verifyTokenAdmin } from "./middleware/VerifyToken.js";
 dotenv.config();
 const app = express();
 
+const corsOptions = {
+  origin: 'https://silasbeckmann.de', // Domain des Frontends
+  optionsSuccessStatus: 200,
+  credentials: true,
+};
+
+app.use(cookieParser());
+app.use(bodyParser.json());
+app.use(cors(corsOptions));
+app.use(express.json());
+
 const UPLOAD_DIR = 'uploads';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -99,16 +110,7 @@ app.post('/meal', verifyTokenAdmin, upload.single('image'), async (req, res) => 
   }
 });
 
-const corsOptions = {
-  origin: 'https://silasbeckmann.de', // Domain des Frontends
-  optionsSuccessStatus: 200,
-  credentials: true,
-};
 
-app.use(bodyParser.json());
-app.use(cors(corsOptions));
-app.use(cookieParser());
-app.use(express.json());
 
 Meal.belongsToMany(Ingredient, { 
   through: MealIngredient,
