@@ -65,17 +65,23 @@ app.post('/meal', upload.single('image'), async (req, res) => {
       sodium: formData.sodium,
       image: publicUrl
     });
-    console.log(formData);
-    console.log(formData.ingredients);
-    if (formData.ingredients && formData.ingredients.length) {
-      for (const ingredient of formData.ingredients) {
-        console.log(ingredient);
-        const ing = await Ingredient.create({ name: ingredient.name, measure: ingredient.measure, quantity: ingredient.quantity });
 
-        await meal.addIngredient(ing, { through: { quantity: ingredient.quantity } });
+    if (Array.isArray(formData.ingredients) && formData.ingredients.length > 0) {
+      try {
+        const ingredientPromises = formData.ingredients.map(async (ingredient) => {
+          console.log(ingredient);
+          const ing = await Ingredient.create({ name: ingredient.name, measure: ingredient.measure, quantity: ingredient.quantity });
+          return meal.addIngredient(ing, { through: { quantity: ingredient.quantity } });
+        });
+    
+        await Promise.all(ingredientPromises);
+      } catch (error) {
+        console.error('Error processing ingredients:', error);
       }
+    } else {
+      console.log('No ingredients found or ingredients is not an array.');
     }
-
+    
     const result = await Meal.findByPk(meal.id, {
       include: {
         model: Ingredient,
