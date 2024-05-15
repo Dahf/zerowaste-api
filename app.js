@@ -19,20 +19,25 @@ const UPLOAD_DIR = 'uploads';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+const uploadPath = path.join(__dirname, UPLOAD_DIR);
+if (!fs.existsSync(uploadPath)) {
+    fs.mkdirSync(uploadPath, { recursive: true });
+}
+
 // Konfigurieren von Multer für Dateiuploads
 const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-      cb(null, path.join(__dirname, UPLOAD_DIR)); // Verzeichnis, in das die Dateien hochgeladen werden sollen
-  },
-  filename: (req, file, cb) => {
-      cb(null, Date.now() + '-' + file.originalname); // Dateiname
-  },
+    destination: (req, file, cb) => {
+        cb(null, uploadPath); // Verzeichnis, in das die Dateien hochgeladen werden sollen
+    },
+    filename: (req, file, cb) => {
+        cb(null, Date.now() + '-' + file.originalname); // Dateiname
+    },
 });
 
 const upload = multer({ storage: storage });
 
 
-app.use('/uploads', express.static(path.join(__dirname, UPLOAD_DIR)));
+app.use('/uploads', express.static(uploadPath));
 
 app.post('/meal', upload.single('image'), (req, res) => {
   const file = req.file;
