@@ -39,38 +39,32 @@ const upload = multer({ storage: storage });
 
 
 app.use('/uploads', express.static(uploadPath));
-
 app.post('/meal', upload.single('image'), async (req, res) => {
   const file = req.file;
-  const body = req.body;
+  const { name, description, servingSize, calories, fat, carbohydrates, protein, fiber, sugar, sodium, ingredients } = req.body
+
   try {
     if (!file) {
         return res.status(400).send('Keine Datei hochgeladen');
     }
     const publicUrl = `${req.protocol}://silasbeckmann.de/api/uploads/${file.filename}`;
 
-    const formData = {};
-    for (const key in body) {
-        formData[key] = body[key];
-    }
-    console.log(formData);
-
     const meal = await Meal.create({
-      name: formData.name,
-      description: formData.description,
-      servingSize: formData.servingSize,
-      calories: formData.calories,
-      fat: formData.fat,
-      carbohydrates: formData.carbohydrates,
-      protein: formData.protein,
-      fiber: formData.fiber,
-      sugar: formData.sugar,
-      sodium: formData.sodium,
+      name: name,
+      description: description,
+      servingSize: servingSize,
+      calories: calories,
+      fat: fat,
+      carbohydrates: carbohydrates,
+      protein: protein,
+      fiber: fiber,
+      sugar: sugar,
+      sodium: sodium,
       image: publicUrl
     });
     
-    if (formData.ingredients && formData.ingredients.length) {
-      for (const ingredient of formData.ingredients) {
+    if (ingredients && ingredients.length) {
+      for (const ingredient of ingredients) {
         console.log("ing:" + ingredient)
         const ing = await Ingredient.create({ name: ingredient.name, measure: ingredient.measure, quantity: ingredient.quantity });
 
@@ -95,10 +89,7 @@ app.post('/meal', upload.single('image'), async (req, res) => {
     res.status(500).json({ error: 'Failed to create meal' });
   }
 });
-process.on('unhandledRejection', (reason, promise) => {
-  console.error('Unhandled Rejection at:', promise, 'reason:', reason);
-  // Handle logging or cleanup tasks
-});
+
 const corsOptions = {
   origin: 'https://silasbeckmann.de', // Domain des Frontends
   optionsSuccessStatus: 200,
