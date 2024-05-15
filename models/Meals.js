@@ -21,7 +21,7 @@ const MealModel = db.define('meals',{
     allowNull: false
   },
   servingSize: {
-    type: DataTypes.INTEGER,
+    type: DataTypes.TEXT,
     allowNull: false
   },
   calories: {
