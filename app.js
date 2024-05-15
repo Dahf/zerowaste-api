@@ -22,9 +22,9 @@ const corsOptions = {
   credentials: true,
 };
 
-app.use(cookieParser());
 app.use(bodyParser.json());
 app.use(cors(corsOptions));
+app.use(cookieParser());
 app.use(express.json());
 
 const UPLOAD_DIR = 'uploads';
