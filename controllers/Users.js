@@ -107,6 +107,9 @@ export const Login = async(req, res) => {
                 email: req.body.email
             }
         });
+        if (user.length === 0) {
+            return res.status(404).json({ msg: "User not found" });
+        }
         const match = await bcrypt.compare(req.body.password, user[0].password);
         if(!match) return res.status(400).json({msg: "Wrong Password"});
         const userId = user[0].id;

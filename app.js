@@ -25,6 +25,8 @@ app.use(cors(corsOptions));
 app.use(cookieParser());
 app.use(express.json());
 
+app.use(router);
+
 const UPLOAD_DIR = 'uploads';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -127,7 +129,6 @@ Ingredient.belongsToMany(Meal, { through: MealIngredient });
 
 const PORT = process.env.PORT || 8088;
 
-app.use(router);
 
 app.listen(PORT, () => {
     console.log("Server Listening on PORT:", PORT);
