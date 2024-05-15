@@ -13,6 +13,7 @@ import path from "path";
 import { fileURLToPath } from 'url';
 import fs from 'fs';
 import { verifyTokenAdmin } from "./middleware/VerifyToken.js";
+
 dotenv.config();
 const app = express();
 
@@ -22,7 +23,6 @@ const corsOptions = {
   credentials: true,
 };
 
-app.use(bodyParser.json());
 app.use(cors(corsOptions));
 app.use(cookieParser());
 app.use(express.json());
