@@ -55,6 +55,7 @@ app.use('/uploads', express.static(uploadPath));
 app.post('/meal', verifyTokenAdmin, upload.single('image'), async (req, res) => {
   const file = req.file;
   const body = req.body;
+  console.log(req);
   try {
     if (!file) {
         return res.status(400).send('Keine Datei hochgeladen');
