@@ -1,7 +1,7 @@
 import express from "express";
 import { verifyToken, verifyTokenAdmin } from "../middleware/VerifyToken.js";
 import { createMeal, getMeal } from "../controllers/Meals.js";
-import { Login, Logout } from "../controllers/Users.js";
+import { Login, Logout, Register } from "../controllers/Users.js";
 import { refreshToken } from "../controllers/RefreshToken.js";
 
 const router = express.Router();
@@ -15,6 +15,7 @@ router.get("/status", (request, response) => {
 
 router.post("/meal", verifyTokenAdmin, createMeal);
 router.post('/login', Login);
+router.post('/register', Register);
 router.get('/token', refreshToken);
 router.delete('/logout', Logout);
 router.get('/meals', getMeal);
