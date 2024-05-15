@@ -24,7 +24,7 @@ async function translateText(text, targetLang, sourceLang = 'auto') {
 export const createMeal = async(request, response) => {
     const { name, image, description, servingSize, calories, fat, carbohydrates, protein, fiber, sugar, sodium, ingredients } = request.body
     try {
-      console.log(req.body);
+      console.log(request.body);
       const meal = await Meal.create({
         name,
         image,
