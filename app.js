@@ -40,7 +40,7 @@ const upload = multer({ storage: storage });
 
 app.use('/uploads', express.static(uploadPath));
 
-app.post('/meal', upload.single('image'), (req, res) => {
+app.post('/api/meal', upload.single('image'), (req, res) => {
   const file = req.file;
   const body = req.body;
 
@@ -54,9 +54,7 @@ app.post('/meal', upload.single('image'), (req, res) => {
   // Verarbeite die anderen Formulardaten
   const formData = {};
   for (const key in body) {
-      if (body.hasOwnProperty(key)) {
-          formData[key] = body[key];
-      }
+      formData[key] = body[key];
   }
   console.log('Verarbeitete Formulardaten:', formData);
 
