@@ -50,14 +50,11 @@ app.post('/meal', upload.single('image'), async (req, res) => {
   const publicUrl = `${req.protocol}://silasbeckmann.de/api/uploads/${file.filename}`;
 
   const formData = {};
-    for (const key in body) {
-        if (body.hasOwnProperty(key)) {
-            formData[key] = body[key];
-        }
-    }
-
+  for (const key in body) {
+      formData[key] = body[key];
+  }
   console.log(formData);
-  
+
   const meal = await Meal.create({
     name: formData.name,
     description: formData.description,
