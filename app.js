@@ -49,7 +49,7 @@ app.post('/meal', upload.single('image'), async (req, res) => {
         return res.status(400).send('Keine Datei hochgeladen');
     }
     const publicUrl = `${req.protocol}://silasbeckmann.de/api/uploads/${file.filename}`;
-
+    console.log(ingredients)
     const meal = await Meal.create({
       name: name,
       description: description,
