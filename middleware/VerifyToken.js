@@ -17,7 +17,7 @@ export const verifyTokenAdmin = (req, res, next) => {
     const refreshToken = req.cookies.refreshToken;
     if (!refreshToken) return res.sendStatus(401);
 
-    jwt.verify(refreshToken, process.env.ACCESS_TOKEN_SECRET, async (err, decoded) => {
+    jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, async (err, decoded) => {
         if (err) { console.log(err); return res.sendStatus(403); }
 
         const user = await Users.findAll({
