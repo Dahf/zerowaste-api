@@ -31,6 +31,7 @@ export const refreshToken = async(req, res) => {
             const accessToken = jwt.sign({userId, kndnr, vorname, nachname, plz, ort, land, geburtstag, phone, anrede, straße, hausnummer, email, rank, confirmed}, process.env.ACCESS_TOKEN_SECRET,{
                 expiresIn: '15s'
             });
+            
             res.json({ accessToken });
         });
     } catch (error) {

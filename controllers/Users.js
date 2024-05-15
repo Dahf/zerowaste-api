@@ -142,7 +142,8 @@ export const Login = async(req, res) => {
             path: "/",
             maxAge: 24 * 60 * 60 * 1000
         });
-        res.json({ accessToken });
+        res.setHeader('Authorization', `Bearer ${accessToken}`);
+        res.status(200);
     } catch (error) {
         res.status(404).json({msg: error});
     }
