@@ -100,57 +100,63 @@ export const Register = async(req, res) => {
     }
 }
  
-export const Login = async(req, res) => {
+export const Login = async (req, res) => {
     try {
-        const user = await Users.findAll({
-            where:{
+        const user = await Users.findOne({
+            where: {
                 email: req.body.email
             }
         });
-        if (user.length === 0) {
+        if (!user) {
             return res.status(404).json({ msg: "User not found" });
         }
-        const match = await bcrypt.compare(req.body.password, user[0].password);
-        if(!match) return res.status(400).json({msg: "Wrong Password"});
-        const userId = user[0].id;
-        const kndnr = user[0].kndnr;
-        const email = user[0].email;
-        const rank = user[0].rank;
-        const vorname = user[0].vorname;
-        const nachname = user[0].nachname;
-        const plz = user[0].plz;
-        const ort = user[0].ort;
-        const land = user[0].land;
-        const geburtstag = user[0].geburtstag;
-        const phone = user[0].phone;
-        const anrede = user[0].anrede;
-        const straße = user[0].straße;
-        const hausnummer = user[0].hausnummer;
-        const confirmed = user[0].confirmed;
-        const accessToken = jwt.sign({kndnr, userId, vorname, nachname, plz, ort, land, geburtstag, phone, anrede, straße, hausnummer, email, rank, confirmed}, process.env.ACCESS_TOKEN_SECRET,{
-            expiresIn: '15s'
-        });
-        const refreshToken = jwt.sign({kndnr, userId, vorname, nachname, plz, ort, land, geburtstag, phone, anrede, straße, hausnummer, email, rank, confirmed}, process.env.REFRESH_TOKEN_SECRET,{
-            expiresIn: '1d'
-        });
-        await Users.update({refresh_token: refreshToken},{
-            where:{
+        
+        const match = await bcrypt.compare(req.body.password, user.password);
+        if (!match) {
+            return res.status(400).json({ msg: "Wrong password" });
+        }
+
+        const { id: userId, kndnr, email, rank, vorname, nachname, plz, ort, land, geburtstag, phone, anrede, straße, hausnummer, confirmed } = user;
+
+        const accessToken = jwt.sign(
+            { userId, kndnr, email, rank, vorname, nachname, plz, ort, land, geburtstag, phone, anrede, straße, hausnummer, confirmed },
+            process.env.ACCESS_TOKEN_SECRET,
+            { expiresIn: '15m' }  // Adjusted for practical use
+        );
+
+        const refreshToken = jwt.sign(
+            { userId },
+            process.env.REFRESH_TOKEN_SECRET,
+            { expiresIn: '1d' }
+        );
+
+        await Users.update({ refresh_token: refreshToken }, {
+            where: {
                 id: userId
             }
         });
+
         res.cookie('refreshToken', refreshToken, {
             secure: true,
             httpOnly: true, 
             sameSite: 'None',
             path: "/",
-            maxAge: 24 * 60 * 60 * 1000
+            maxAge: 24 * 60 * 60 * 1000  // 1 day
         });
-        res.status(200).json({ accessToken });
+        res.cookie('accessToken', accessToken, {
+            secure: true, // Nur über HTTPS senden
+            httpOnly: true, // Nicht über JavaScript zugänglich
+            sameSite: 'Strict', // CSRF-Schutz
+            path: "/", // Für alle Pfade gültig
+            maxAge: 900000 // Gültigkeitsdauer in Millisekunden (z.B. 15 Minuten)
+        });
+        res.status(200).json({ accessToken, refreshToken });  // Optionally include the refreshToken in the response for clarity
     } catch (error) {
-        res.status(404).json({msg: error});
+        console.error("Login error:", error);
+        res.status(500).json({ msg: "Internal server error" });
     }
 }
- 
+
 export const Logout = async(req, res) => {
     const refreshToken = req.cookies.refreshToken;
     if(!refreshToken) return res.sendStatus(204);

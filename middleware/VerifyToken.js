@@ -13,7 +13,7 @@ export const verifyToken = (req, res, next) => {
 }
 
 export const verifyTokenAdmin = (req, res, next) => {
-    const authHeader = req.headers['authorization'];
+    const authHeader = req.cookies.accessToken;
     if (!authHeader) {
         console.error("Authorization header is missing");
         return res.status(401).send("Authorization header is missing");

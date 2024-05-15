@@ -1,40 +1,55 @@
 import Users from "../models/UserModel.js";
 import jwt from "jsonwebtoken";
  
-export const refreshToken = async(req, res) => {
+export const refreshToken = async (req, res) => {
     try {
         const refreshToken = req.cookies.refreshToken;
-        if(!refreshToken) return res.sendStatus(401);
-        const user = await Users.findAll({
-            where:{
+        if (!refreshToken) {
+            console.log("Refresh token not found in cookies");
+            return res.sendStatus(401); // Unauthorized
+        }
+
+        const user = await Users.findOne({
+            where: {
                 refresh_token: refreshToken
             }
         });
-        if(!user[0]) return res.sendStatus(403);
+
+        if (!user) {
+            console.log("No user found with the provided refresh token");
+            return res.sendStatus(403); // Forbidden
+        }
+
         jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, (err, decoded) => {
-            if (err) return res.sendStatus(403);
-            const kndnr = user[0].kndnr;
-            const userId = user[0].id;
-            const email = user[0].email;
-            const rank = user[0].rank;
-            const vorname = user[0].vorname;
-            const nachname = user[0].nachname;
-            const plz = user[0].plz;
-            const ort = user[0].ort;
-            const land = user[0].land;
-            const geburtstag = user[0].geburtstag;
-            const phone = user[0].phone;
-            const anrede = user[0].anrede; 
-            const straße = user[0].straße;
-            const hausnummer = user[0].hausnummer;
-            const confirmed = user[0].confirmed;
-            const accessToken = jwt.sign({userId, kndnr, vorname, nachname, plz, ort, land, geburtstag, phone, anrede, straße, hausnummer, email, rank, confirmed}, process.env.ACCESS_TOKEN_SECRET,{
-                expiresIn: '15s'
+            if (err) {
+                console.log("Failed to verify refresh token:", err);
+                return res.sendStatus(403); // Forbidden
+            }
+
+            const {
+                kndnr, id: userId, email, rank, vorname, nachname,
+                plz, ort, land, geburtstag, phone, anrede, straße,
+                hausnummer, confirmed
+            } = user;
+
+            const accessToken = jwt.sign(
+                { userId, kndnr, email, rank, vorname, nachname, plz, ort, land, geburtstag, phone, anrede, straße, hausnummer, confirmed },
+                process.env.ACCESS_TOKEN_SECRET,
+                { expiresIn: '15m' } // Adjusted from 15s for practical use
+            );
+
+            res.cookie('accessToken', accessToken, {
+                secure: true, // Nur über HTTPS senden
+                httpOnly: true, // Nicht über JavaScript zugänglich
+                sameSite: 'Strict', // CSRF-Schutz
+                path: "/", // Für alle Pfade gültig
+                maxAge: 900000 // Gültigkeitsdauer in Millisekunden (z.B. 15 Minuten)
             });
-            
+
             res.json({ accessToken });
         });
     } catch (error) {
-        console.log(error);
+        console.error("Error in refreshToken function:", error);
+        res.status(500).send("Internal Server Error");
     }
 }
