@@ -9,6 +9,8 @@ import cookieParser from "cookie-parser";
 import bodyParser from "body-parser";
 import cors from "cors";
 import multer from "multer";
+import path from "path";
+
 dotenv.config();
 const app = express();
 
