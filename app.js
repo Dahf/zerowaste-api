@@ -66,6 +66,7 @@ app.post('/meal', upload.single('image'), async (req, res) => {
     
     if (ingredients && ingredients.length) {
       for (const ingredient of ingredients) {
+        console.log(ingredient);
         const ing = await Ingredient.create({ name: ingredient.name, measure: ingredient.measure, quantity: ingredient.quantity });
 
         await meal.addIngredient(ing, { through: { quantity: ingredient.quantity } });
