@@ -71,6 +71,7 @@ app.post('/meal', upload.single('image'), async (req, res) => {
   
   if (formData.ingredients && formData.ingredients.length) {
     for (const ingredient of formData.ingredients) {
+      console.log("ing:" + ingredient)
       const ing = await Ingredient.create({ name: ingredient.name, measure: ingredient.measure, quantity: ingredient.quantity });
 
       await meal.addIngredient(ing, { through: { quantity: ingredient.quantity } });
@@ -86,6 +87,7 @@ app.post('/meal', upload.single('image'), async (req, res) => {
       }
     }
   });
+  console.log("results:" + result);
   
   res.status(200).json(result);
 });
