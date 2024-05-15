@@ -57,9 +57,9 @@ export const createMeal = async(request, response) => {
           }
         }
       });
-      res.status(201).json(result);
+      response.status(201).json(result);
     } catch (error) {
-      res.status(500).send('Server error: ' + error.message);
+      response.status(500).send('Server error: ' + error.message);
     }
 }
 
