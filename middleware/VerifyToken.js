@@ -24,6 +24,7 @@ export const verifyTokenAdmin = (req, res, next) => {
                 email: decoded.email
             }
         });
+        console.log(user)
         const rank = user[0].rank;
         if(rank == 0) return res.sendStatus(401);
         next();
