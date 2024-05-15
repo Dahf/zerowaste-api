@@ -34,7 +34,7 @@ const upload = multer({ storage: storage });
 
 app.use('/uploads', express.static(path.join(__dirname, UPLOAD_DIR)));
 
-app.post('/api/meal', upload.single('image'), (req, res) => {
+app.post('/meal', upload.single('image'), (req, res) => {
   const file = req.file;
   const body = req.body;
 
