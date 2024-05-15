@@ -66,6 +66,7 @@ app.post('/meal', upload.single('image'), async (req, res) => {
       image: publicUrl
     });
     console.log(formData);
+    console.log(formData.ingredients);
     if (formData.ingredients && formData.ingredients.length) {
       for (const ingredient of formData.ingredients) {
         console.log(ingredient);
