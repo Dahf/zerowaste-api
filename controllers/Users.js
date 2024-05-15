@@ -63,7 +63,7 @@ export const updateUser = async (req, res) => {
     }
 }
 export const Register = async(req, res) => {
-    const { vorname, nachname, plz, ort, land, geburtstag, phone, anrede, straße, hausnummer, email, password, confPassword } = req.body;
+    const { vorname, nachname, plz, ort, land, geburtstag, phone, anrede, straße, hausnummer, email, password } = req.body;
     
     const user = await Users.findAll({
         where:{
@@ -71,7 +71,6 @@ export const Register = async(req, res) => {
         }
     });
     if(user.length == 0){
-        if(password !== confPassword) return res.status(400).json({msg: "Password and Confirm Password do not match"});
         const salt = await bcrypt.genSalt();
         const hashPassword = await bcrypt.hash(password, salt);
         try {
