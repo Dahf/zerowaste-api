@@ -8,6 +8,7 @@ services:
     volumes:
       - .:/usr/app/
       - /usr/app/node_modules
+      - ./uploads:/usr/src/app/uploads
     depends_on:
       - postgres
     environment:

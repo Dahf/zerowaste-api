@@ -15,5 +15,7 @@ RUN npm install pm2 -g
 # Bundle app source
 COPY . .
 
+RUN mkdir -p uploads
+
 EXPOSE 8088
 CMD ["pm2-runtime", "app.js", "-i", "max"]
