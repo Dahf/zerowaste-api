@@ -12,6 +12,7 @@ import multer from "multer";
 import path from "path";
 import { fileURLToPath } from 'url';
 import fs from 'fs';
+import { verifyTokenAdmin } from "./middleware/VerifyToken.js";
 dotenv.config();
 const app = express();
 
@@ -40,7 +41,7 @@ const upload = multer({ storage: storage });
 
 app.use('/uploads', express.static(uploadPath));
 
-app.post('/meal', upload.single('image'), async (req, res) => {
+app.post('/meal', verifyTokenAdmin, upload.single('image'), async (req, res) => {
   const file = req.file;
   const body = req.body;
   try {
@@ -81,7 +82,7 @@ app.post('/meal', upload.single('image'), async (req, res) => {
     } else {
       console.log('No ingredients found or ingredients is not an array.');
     }
-    
+
     const result = await Meal.findByPk(meal.id, {
       include: {
         model: Ingredient,
@@ -127,24 +128,6 @@ Ingredient.belongsToMany(Meal, { through: MealIngredient });
 const PORT = process.env.PORT || 8088;
 
 app.use(router);
-
-async function createMealWithIngredients() {
-  const meal = await Meal.create({
-    name: 'Veggie Pizza',
-    description: 'A delicious vegetarian pizza with lots of fresh toppings.',
-    servingSize: 2
-  });
-
-  const tomato = await Ingredient.create({ name: 'Tomato', measure: 'g', quantity: '3' });
-  const cheese = await Ingredient.create({ name: 'Cheese', measure: 'g', quantity: '3' });
-
-  await meal.addIngredient(tomato, { through: { measure: '2 cups' } });
-  await meal.addIngredient(cheese, { through: { measure: '1.5 cups' } });
-
-  console.log('Meal and Ingredients added');
-}
-
-//createMealWithIngredients();
 
 app.listen(PORT, () => {
     console.log("Server Listening on PORT:", PORT);
