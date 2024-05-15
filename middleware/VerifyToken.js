@@ -13,6 +13,7 @@ export const verifyToken = (req, res, next) => {
 }
 
 export const verifyTokenAdmin = (req, res, next) => {
+    console.log(req.cookies);
     const refreshToken = req.cookies.refreshToken;
     if (!refreshToken) return res.sendStatus(401);
 
