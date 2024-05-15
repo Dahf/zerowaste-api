@@ -38,11 +38,7 @@ export const createMeal = async(request, response) => {
       });
       if (ingredients && ingredients.length) {
         for (const ingredient of ingredients) {
-          const [ing, created] = await Ingredient.findOrCreate({
-            where: { name: ingredient.name },
-            defaults: { measure: ingredient.measure }
-          });
-  
+          const ing = await Ingredient.create({ name: ingredient.name, measure: ingredient.measure, quantity: ingredient.quantity });
           // Verbinden der Zutat mit der Mahlzeit mit zusätzlichen Mengenangaben
           await meal.addIngredient(ing, { through: { quantity: ingredient.quantity } });
         }
