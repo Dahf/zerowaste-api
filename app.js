@@ -8,7 +8,7 @@ import MealIngredient from "./models/MealIngredients.js";
 import cookieParser from "cookie-parser";
 import bodyParser from "body-parser";
 import cors from "cors";
-
+import multer from "multer";
 dotenv.config();
 const app = express();
 
@@ -58,6 +58,7 @@ const corsOptions = {
   credentials: true,
 };
 
+app.use(bodyParser.json());
 app.use(cors(corsOptions));
 app.use(cookieParser());
 app.use(express.json());
