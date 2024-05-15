@@ -40,32 +40,49 @@ const upload = multer({ storage: storage });
 
 app.use('/uploads', express.static(uploadPath));
 
-app.post('/meal', upload.single('image'), (req, res) => {
+app.post('/meal', upload.single('image'), async (req, res) => {
   const file = req.file;
-  const body = req.body;
-
-  console.log('Datei:', file);
-  console.log('Formulardaten:', body);
+  const { name, image, description, servingSize, calories, fat, carbohydrates, protein, fiber, sugar, sodium, ingredients } = request.body
 
   if (!file) {
       return res.status(400).send('Keine Datei hochgeladen');
   }
+  const publicUrl = `${req.protocol}://silasbeckmann.de/api/uploads/${file.filename}`;
 
-  // Verarbeite die anderen Formulardaten
-  const formData = {};
-  for (const key in body) {
-      formData[key] = body[key];
-  }
-  console.log('Verarbeitete Formulardaten:', formData);
-
-  // Generiere den öffentlichen Link zur hochgeladenen Datei
-  const publicUrl = `${req.protocol}://${req.get('host')}/uploads/${file.filename}`;
-
-  // Sende die Antwort an den Client
-  res.status(200).json({
-      message: 'Upload erfolgreich',
-      fileUrl: publicUrl
+  const meal = await Meal.create({
+    name,
+    image,
+    description,
+    servingSize,
+    calories,
+    fat,
+    carbohydrates,
+    protein,
+    fiber,
+    sugar,
+    sodium,
+    image: publicUrl
   });
+  
+  if (ingredients && ingredients.length) {
+    for (const ingredient of ingredients) {
+      const ing = await Ingredient.create({ name: ingredient.name, measure: ingredient.measure, quantity: ingredient.quantity });
+      // Verbinden der Zutat mit der Mahlzeit mit zusätzlichen Mengenangaben
+      await meal.addIngredient(ing, { through: { quantity: ingredient.quantity } });
+    }
+  }
+
+  // Antwort mit der erstellten Mahlzeit und ihren Zutaten
+  const result = await Meal.findByPk(meal.id, {
+    include: {
+      model: Ingredient,
+      through: {
+        model: MealIngredient
+      }
+    }
+  });
+  
+  res.status(200).json(result);
 });
 
 const corsOptions = {
