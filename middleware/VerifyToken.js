@@ -19,13 +19,7 @@ export const verifyTokenAdmin = (req, res, next) => {
         return res.status(401).send("Authorization header is missing");
     }
 
-    const token = authHeader.split(' ')[1];
-    if (!token) {
-        console.error("Token not found in authorization header");
-        return res.status(401).send("Token not found in authorization header");
-    }
-
-    jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, async (err, decoded) => {
+    jwt.verify(authHeader, process.env.ACCESS_TOKEN_SECRET, async (err, decoded) => {
         if (err) {
             console.error("JWT verification error:", err);
             return res.status(403).send("Invalid token");
