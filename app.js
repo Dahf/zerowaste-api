@@ -10,22 +10,27 @@ import bodyParser from "body-parser";
 import cors from "cors";
 import multer from "multer";
 import path from "path";
-
+import { fileURLToPath } from 'url';
 dotenv.config();
 const app = express();
 
 const UPLOAD_DIR = 'uploads';
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 // Konfigurieren von Multer für Dateiuploads
 const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        cb(null, UPLOAD_DIR); // Verzeichnis, in das die Dateien hochgeladen werden sollen
-    },
-    filename: (req, file, cb) => {
-        cb(null, Date.now() + '-' + file.originalname); // Dateiname
-    },
+  destination: (req, file, cb) => {
+      cb(null, path.join(__dirname, UPLOAD_DIR)); // Verzeichnis, in das die Dateien hochgeladen werden sollen
+  },
+  filename: (req, file, cb) => {
+      cb(null, Date.now() + '-' + file.originalname); // Dateiname
+  },
 });
+
 const upload = multer({ storage: storage });
+
 
 app.use('/uploads', express.static(path.join(__dirname, UPLOAD_DIR)));
 
