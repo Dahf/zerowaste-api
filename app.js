@@ -42,7 +42,7 @@ app.use('/uploads', express.static(uploadPath));
 
 app.post('/meal', upload.single('image'), async (req, res) => {
   const file = req.file;
-  const { name, image, description, servingSize, calories, fat, carbohydrates, protein, fiber, sugar, sodium, ingredients } = request.body
+  const { name, image, description, servingSize, calories, fat, carbohydrates, protein, fiber, sugar, sodium, ingredients } = req.body
 
   if (!file) {
       return res.status(400).send('Keine Datei hochgeladen');
