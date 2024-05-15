@@ -52,7 +52,12 @@ app.post('/meal', upload.single('image'), (req, res) => {
   }
 
   // Verarbeite die anderen Formulardaten
-  const formData = JSON.parse(body.formData);
+  const formData = {};
+  for (const key in body) {
+      if (body.hasOwnProperty(key)) {
+          formData[key] = body[key];
+      }
+  }
   console.log('Verarbeitete Formulardaten:', formData);
 
   // Generiere den öffentlichen Link zur hochgeladenen Datei
