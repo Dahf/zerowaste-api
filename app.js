@@ -39,6 +39,7 @@ const upload = multer({ storage: storage });
 
 
 app.use('/uploads', express.static(uploadPath));
+
 app.post('/meal', upload.single('image'), async (req, res) => {
   const file = req.file;
   const { name, description, servingSize, calories, fat, carbohydrates, protein, fiber, sugar, sodium, ingredients } = req.body
@@ -65,14 +66,12 @@ app.post('/meal', upload.single('image'), async (req, res) => {
     
     if (ingredients && ingredients.length) {
       for (const ingredient of ingredients) {
-        console.log("ing:" + ingredient)
         const ing = await Ingredient.create({ name: ingredient.name, measure: ingredient.measure, quantity: ingredient.quantity });
 
         await meal.addIngredient(ing, { through: { quantity: ingredient.quantity } });
       }
     }
 
-    // Antwort mit der erstellten Mahlzeit und ihren Zutaten
     const result = await Meal.findByPk(meal.id, {
       include: {
         model: Ingredient,
@@ -81,7 +80,6 @@ app.post('/meal', upload.single('image'), async (req, res) => {
         }
       }
     });
-    console.log("results:" + result);
     
     res.status(200).json(result);
   } catch (error) {
