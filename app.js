@@ -55,6 +55,9 @@ app.post('/meal', upload.single('image'), async (req, res) => {
             formData[key] = body[key];
         }
     }
+
+  console.log(formData);
+  
   const meal = await Meal.create({
     name: formData.name,
     description: formData.description,
