@@ -42,30 +42,32 @@ app.use('/uploads', express.static(uploadPath));
 
 app.post('/meal', upload.single('image'), async (req, res) => {
   const file = req.file;
-  const { name, description, servingSize, calories, fat, carbohydrates, protein, fiber, sugar, sodium, ingredients } = req.body
 
   try {
     if (!file) {
         return res.status(400).send('Keine Datei hochgeladen');
     }
     const publicUrl = `${req.protocol}://silasbeckmann.de/api/uploads/${file.filename}`;
-    console.log(ingredients)
+    const formData = {};
+    for (const key in body) {
+        formData[key] = body[key];
+    }
     const meal = await Meal.create({
-      name: name,
-      description: description,
-      servingSize: servingSize,
-      calories: calories,
-      fat: fat,
-      carbohydrates: carbohydrates,
-      protein: protein,
-      fiber: fiber,
-      sugar: sugar,
-      sodium: sodium,
+      name: formData.name,
+      description: formData.description,
+      servingSize: formData.servingSize,
+      calories: formData.calories,
+      fat: formData.fat,
+      carbohydrates: formData.carbohydrates,
+      protein: formData.protein,
+      fiber: formData.fiber,
+      sugar: formData.sugar,
+      sodium: formData.sodium,
       image: publicUrl
     });
-    
-    if (ingredients && ingredients.length) {
-      for (const ingredient of ingredients) {
+    console.log(formData);
+    if (formData.ingredients && formData.ingredients.length) {
+      for (const ingredient of formData.ingredients) {
         console.log(ingredient);
         const ing = await Ingredient.create({ name: ingredient.name, measure: ingredient.measure, quantity: ingredient.quantity });
 
