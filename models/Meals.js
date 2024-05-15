@@ -16,6 +16,10 @@ const MealModel = db.define('meals',{
     type: DataTypes.TEXT,
     allowNull: false
   },
+  image: {
+    type: DataTypes.TEXT,
+    allowNull: false
+  },
   servingSize: {
     type: DataTypes.INTEGER,
     allowNull: false

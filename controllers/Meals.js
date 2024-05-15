@@ -22,11 +22,12 @@ async function translateText(text, targetLang, sourceLang = 'auto') {
 }
 
 export const createMeal = async(request, response) => {
-    const { name, description, servingSize, calories, fat, carbohydrates, protein, fiber, sugar, sodium, ingredients } = request.body
+    const { name, image, description, servingSize, calories, fat, carbohydrates, protein, fiber, sugar, sodium, ingredients } = request.body
     try {
 
       const meal = await Meal.create({
         name,
+        image,
         description,
         servingSize,
         calories,
@@ -61,8 +62,19 @@ export const createMeal = async(request, response) => {
 }
 
 export const getMeal = async(req, res) => {
-    const { ingredient, lan } = req.query;
+    const { ingredient, lan, id } = req.query;
     try {
+      if(id){
+        const result = await Meal.findByPk(id, {
+          include: {
+            model: Ingredient,
+            through: {
+              model: MealIngredient
+            }
+          }
+        });
+        res.json(result);
+      }
       let foundItems;
   
       if (ingredient) {
