@@ -12,8 +12,45 @@ import cors from "cors";
 dotenv.config();
 const app = express();
 
-app.use(bodyParser.json({limit: '100mb'}));
-app.use(bodyParser.urlencoded({limit: '100mb', extended: true}));
+const UPLOAD_DIR = 'uploads';
+
+// Konfigurieren von Multer für Dateiuploads
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, UPLOAD_DIR); // Verzeichnis, in das die Dateien hochgeladen werden sollen
+    },
+    filename: (req, file, cb) => {
+        cb(null, Date.now() + '-' + file.originalname); // Dateiname
+    },
+});
+const upload = multer({ storage: storage });
+
+app.use('/uploads', express.static(path.join(__dirname, UPLOAD_DIR)));
+
+app.post('/api/meal', upload.single('image'), (req, res) => {
+  const file = req.file;
+  const body = req.body;
+
+  console.log('Datei:', file);
+  console.log('Formulardaten:', body);
+
+  if (!file) {
+      return res.status(400).send('Keine Datei hochgeladen');
+  }
+
+  // Verarbeite die anderen Formulardaten
+  const formData = JSON.parse(body.formData);
+  console.log('Verarbeitete Formulardaten:', formData);
+
+  // Generiere den öffentlichen Link zur hochgeladenen Datei
+  const publicUrl = `${req.protocol}://${req.get('host')}/uploads/${file.filename}`;
+
+  // Sende die Antwort an den Client
+  res.status(200).json({
+      message: 'Upload erfolgreich',
+      fileUrl: publicUrl
+  });
+});
 
 const corsOptions = {
   origin: 'https://silasbeckmann.de', // Domain des Frontends

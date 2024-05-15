@@ -13,7 +13,6 @@ router.get("/status", (request, response) => {
     response.send(status);
  });
 
-router.post("/meal", createMeal);
 router.post('/login', Login);
 router.post('/register', Register);
 router.get('/token', refreshToken);
