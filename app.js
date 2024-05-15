@@ -42,7 +42,7 @@ app.use('/uploads', express.static(uploadPath));
 
 app.post('/meal', upload.single('image'), async (req, res) => {
   const file = req.file;
-  const { name, image, description, servingSize, calories, fat, carbohydrates, protein, fiber, sugar, sodium, ingredients } = req.body
+  const { name, description, servingSize, calories, fat, carbohydrates, protein, fiber, sugar, sodium, ingredients } = req.body
 
   if (!file) {
       return res.status(400).send('Keine Datei hochgeladen');
@@ -51,7 +51,6 @@ app.post('/meal', upload.single('image'), async (req, res) => {
 
   const meal = await Meal.create({
     name,
-    image,
     description,
     servingSize,
     calories,
@@ -67,7 +66,7 @@ app.post('/meal', upload.single('image'), async (req, res) => {
   if (ingredients && ingredients.length) {
     for (const ingredient of ingredients) {
       const ing = await Ingredient.create({ name: ingredient.name, measure: ingredient.measure, quantity: ingredient.quantity });
-      // Verbinden der Zutat mit der Mahlzeit mit zusätzlichen Mengenangaben
+
       await meal.addIngredient(ing, { through: { quantity: ingredient.quantity } });
     }
   }
