@@ -135,10 +135,10 @@ export const Login = async(req, res) => {
                 id: userId
             }
         });
-        res.cookie('refreshToken', refreshToken,{
-            
+        res.cookie('refreshToken', refreshToken, {
             secure: true,
-            sameSite: 'none',
+            httpOnly: true, 
+            sameSite: 'None',
             path: "/",
             maxAge: 24 * 60 * 60 * 1000
         });
