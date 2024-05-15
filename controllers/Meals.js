@@ -1,6 +1,7 @@
 import Meal from "../models/Meals.js";
 import Ingredient from "../models/Ingredient.js";
 import { Op } from 'sequelize';
+import MealIngredient from "../models/MealIngredients.js";
 
 async function translateText(text, targetLang, sourceLang = 'auto') {
     const response = await fetch("https://translate.silasbeckmann.de/translate", {
@@ -49,7 +50,7 @@ export const createMeal = async(request, response) => {
         include: {
           model: Ingredient,
           through: {
-            attributes: ['quantity']
+            model: MealIngredient
           }
         }
       });
