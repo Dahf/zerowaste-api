@@ -112,7 +112,7 @@ app.post('/meal', verifyTokenAdmin, upload.single('image'), async (req, res) => 
 });
 
 
-
+Meal.hasMany(MealIngredient);
 Meal.belongsToMany(Ingredient, { 
   through: MealIngredient,
   uniqueKey: 'id',
@@ -126,7 +126,11 @@ Meal.belongsToMany(Ingredient, {
   otherKey: 'ingredientId',
   as: 'tagFilter'
 });
+Ingredient.hasMany(MealIngredient);
 Ingredient.belongsToMany(Meal, { through: MealIngredient });
+
+MealIngredient.belongsTo(Meal);
+MealIngredient.belongsTo(Ingredient);
 
 const PORT = process.env.PORT || 8088;
 
