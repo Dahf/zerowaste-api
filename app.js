@@ -81,7 +81,7 @@ app.post('/meal', verifyTokenAdmin, upload.single('image'), async (req, res) => 
     });
     
     console.log(formData);
-    console.log(formData.ingredients);
+    console.log(JSON.stringify(formData.ingredients));
 
     if (Array.isArray(formData.ingredients) && formData.ingredients.length > 0) {
       try {
