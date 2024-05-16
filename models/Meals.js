@@ -29,23 +29,23 @@ const MealModel = db.define('meals',{
     allowNull: true // Kalorien sind optional
   },
   fat: {
-    type: DataTypes.DECIMAL(5, 2), // Gramm Fett
+    type: DataTypes.INTEGER, // Gramm Fett
     allowNull: true
   },
   carbohydrates: {
-    type: DataTypes.DECIMAL(5, 2), // Gramm Kohlenhydrate
+    type: DataTypes.INTEGER, // Gramm Kohlenhydrate
     allowNull: true
   },
   protein: {
-    type: DataTypes.DECIMAL(5, 2), // Gramm Protein
+    type: DataTypes.INTEGER, // Gramm Protein
     allowNull: true
   },
   fiber: {
-    type: DataTypes.DECIMAL(5, 2), // Gramm Ballaststoffe
+    type: DataTypes.INTEGER, // Gramm Ballaststoffe
     allowNull: true
   },
   sugar: {
-    type: DataTypes.DECIMAL(5, 2), // Gramm Zucker
+    type: DataTypes.INTEGER, // Gramm Zucker
     allowNull: true
   },
   sodium: {

@@ -52,9 +52,13 @@ export const getMeal = async(req, res) => {
           name: { [Op.iLike]: '%' + translatedIngredient + '%' }
         }));
   
-        console.log({
-          [Op.and]: ingredientConditions
-        })
+        console.log("Bedingungen mit JSON.stringify:");
+        console.log(JSON.stringify({ [Op.and]: ingredientConditions }, null, 2));
+
+        console.log("Einzelne Bedingungen:");
+        ingredientConditions.forEach(condition => {
+            console.log(JSON.stringify(condition, null, 2));
+        });
   
         foundItems = await Meal.findAll({
           include: [{
