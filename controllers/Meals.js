@@ -46,45 +46,47 @@ export const getMeal = async (req, res) => {
           );
 
           console.log("Translated Ingredients:");
-          translatedIngredients.forEach(condition => {
-              console.log(JSON.stringify(condition, null, 2));
+          translatedIngredients.forEach(translatedIngredient => {
+              console.log(translatedIngredient); // Direkte Ausgabe der übersetzten Zutaten
           });
 
+          // Erstellung der Bedingungen
           const ingredientConditions = translatedIngredients.map(translatedIngredient => {
-              const condition = {
-                  name: { [Op.iLike]: '%' + translatedIngredient + '%' }
+              return {
+                  name: {
+                      [Op.iLike]: `%${translatedIngredient}%`
+                  }
               };
-              console.log("Created Condition:", JSON.stringify(condition, null, 2));
-              return condition;
           });
 
-          console.log("Bedingungen mit JSON.stringify:");
-          console.log(JSON.stringify({ [Op.and]: ingredientConditions }, null, 2));
-
-          console.log("Einzelne Bedingungen:");
-          ingredientConditions.forEach(condition => {
-              console.log(JSON.stringify(condition, null, 2));
-          });
+          // Ausgabe der erstellten Bedingungen
+          console.log("Ingredient Conditions:");
+          console.log(JSON.stringify(ingredientConditions, null, 2));
 
           foundItems = await Meal.findAll({
-              include: [{
-                  model: Ingredient,
-                  required: true, // required should be true if there are ingredients
-              }, {
-                  model: Ingredient,
-                  as: "tagFilter",
-                  required: true, // required should be true if there are ingredients
-                  where: {
-                      [Op.and]: ingredientConditions
+              include: [
+                  {
+                      model: Ingredient,
+                      required: true, // required should be true if there are ingredients
+                  },
+                  {
+                      model: Ingredient,
+                      as: "tagFilter",
+                      required: true, // required should be true if there are ingredients
+                      where: {
+                          [Op.and]: ingredientConditions
+                      }
                   }
-              }],
+              ],
           });
       } else {
           foundItems = await Meal.findAll({
-              include: [{
-                  model: Ingredient,
-                  required: false,
-              }],
+              include: [
+                  {
+                      model: Ingredient,
+                      required: false,
+                  }
+              ],
           });
       }
 
