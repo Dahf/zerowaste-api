@@ -88,7 +88,7 @@ app.post('/meal', verifyTokenAdmin, upload.single('image'), async (req, res) => 
         const ingredientPromises = formData.ingredients.map(async (ingredient) => {
           console.log(ingredient);
           const ing = await Ingredient.create({ name: ingredient.name, measure: ingredient.measure, quantity: ingredient.quantity });
-          return meal.addIngredient(ing, { through: { quantity: ingredient.quantity } });
+          return meal.addIngredient(ing);
         });
     
         await Promise.all(ingredientPromises);
