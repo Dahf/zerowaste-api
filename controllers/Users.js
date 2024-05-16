@@ -116,23 +116,23 @@ export const Login = async (req, res) => {
             return res.status(400).json({ msg: "Wrong password" });
         }
 
-        const { id: userId, kndnr, email, rank, vorname, nachname, plz, ort, land, geburtstag, phone, anrede, straße, hausnummer, confirmed } = user;
+        const { id, kndnr, email, rank, vorname, nachname, plz, ort, land, geburtstag, phone, anrede, straße, hausnummer, confirmed } = user;
 
         const accessToken = jwt.sign(
-            { userId, kndnr, email, rank, vorname, nachname, plz, ort, land, geburtstag, phone, anrede, straße, hausnummer, confirmed },
+            { id, kndnr, email, rank, vorname, nachname, plz, ort, land, geburtstag, phone, anrede, straße, hausnummer, confirmed },
             process.env.ACCESS_TOKEN_SECRET,
             { expiresIn: '15m' }  // Adjusted for practical use
         );
 
         const refreshToken = jwt.sign(
-            { userId },
+            { id },
             process.env.REFRESH_TOKEN_SECRET,
             { expiresIn: '1d' }
         );
 
         await Users.update({ refresh_token: refreshToken }, {
             where: {
-                id: userId
+                id
             }
         });
 
@@ -143,14 +143,7 @@ export const Login = async (req, res) => {
             path: "/",
             maxAge: 24 * 60 * 60 * 1000  // 1 day
         });
-        res.cookie('accessToken', accessToken, {
-            secure: true, // Nur über HTTPS senden
-            httpOnly: true, // Nicht über JavaScript zugänglich
-            sameSite: 'Strict', // CSRF-Schutz
-            path: "/", // Für alle Pfade gültig
-            maxAge: 900000 // Gültigkeitsdauer in Millisekunden (z.B. 15 Minuten)
-        });
-        res.status(200).json({ accessToken, refreshToken });  // Optionally include the refreshToken in the response for clarity
+        res.status(200).json({ accessToken });
     } catch (error) {
         console.error("Login error:", error);
         res.status(500).json({ msg: "Internal server error" });
