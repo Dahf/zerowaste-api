@@ -65,6 +65,7 @@ app.post('/meal', verifyTokenAdmin, upload.single('image'), async (req, res) => 
     for (const key in body) {
         formData[key] = body[key];
     }
+
     const meal = await Meal.create({
       name: formData.name,
       description: formData.description,
@@ -78,6 +79,9 @@ app.post('/meal', verifyTokenAdmin, upload.single('image'), async (req, res) => 
       sodium: formData.sodium,
       image: publicUrl
     });
+    
+    console.log(formData);
+    console.log(formData.ingredients);
 
     if (Array.isArray(formData.ingredients) && formData.ingredients.length > 0) {
       try {
