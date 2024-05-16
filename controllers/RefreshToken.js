@@ -37,15 +37,7 @@ export const refreshToken = async (req, res) => {
                 process.env.ACCESS_TOKEN_SECRET,
                 { expiresIn: '15m' } // Adjusted from 15s for practical use
             );
-
-            res.cookie('accessToken', accessToken, {
-                secure: true, // Nur über HTTPS senden
-                httpOnly: true, // Nicht über JavaScript zugänglich
-                sameSite: 'Strict', // CSRF-Schutz
-                path: "/", // Für alle Pfade gültig
-                maxAge: 900000 // Gültigkeitsdauer in Millisekunden (z.B. 15 Minuten)
-            });
-
+            res.setHeader('Authorization', `Bearer ${accessToken}`);
             res.json({ accessToken });
         });
     } catch (error) {

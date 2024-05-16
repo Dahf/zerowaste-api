@@ -11,42 +11,20 @@ export const verifyToken = (req, res, next) => {
         next();
     })
 }
-
 export const verifyTokenAdmin = (req, res, next) => {
-    const authHeader = req.cookies.accessToken;
-    if (!authHeader) {
-        console.error("Authorization header is missing");
-        return res.status(401).send("Authorization header is missing");
-    }
+    const authHeader = req.headers['authorization'];
+    const token = authHeader && authHeader.split(' ')[1];
+    if(token == null) return res.sendStatus(401).json({ "msg": "token null"});
+    jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, async (err, decoded) => {
+        if (err) { console.log(err); return res.sendStatus(403); }
 
-    jwt.verify(authHeader, process.env.ACCESS_TOKEN_SECRET, async (err, decoded) => {
-        if (err) {
-            console.error("JWT verification error:", err);
-            return res.status(403).send("Invalid token");
-        }
-
-        try {
-            const users = await Users.findAll({
-                where: {
-                    email: decoded.email
-                }
-            });
-            
-            if (!users || users.length === 0) {
-                console.error("User not found with email:", decoded.email);
-                return res.status(404).send("User not found");
+        const user = await Users.findAll({
+            where:{
+                email: decoded.email
             }
-
-            const user = users[0];
-            if (user.rank !== 0) {
-                console.error("Unauthorized access attempt by user:", user.email);
-                return res.status(401).send("Unauthorized");
-            }
-            
-            next();
-        } catch (dbError) {
-            console.error("Database error:", dbError);
-            return res.status(500).send("Database error");
-        }
-    });
+        });
+        const rank = user[0].rank;
+        if(rank == 0) return res.sendStatus(401);
+        next();
+    })
 }
