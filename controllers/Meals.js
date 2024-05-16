@@ -59,6 +59,11 @@ export const getMeal = async(req, res) => {
         ingredientConditions.forEach(condition => {
             console.log(JSON.stringify(condition, null, 2));
         });
+
+        console.log("Translated Ingredients:");
+        translatedIngredients.forEach(condition => {
+            console.log(JSON.stringify(condition, null, 2));
+        });
   
         foundItems = await Meal.findAll({
           include: [{
