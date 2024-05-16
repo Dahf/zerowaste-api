@@ -37,7 +37,7 @@ export const refreshToken = async (req, res) => {
                 process.env.ACCESS_TOKEN_SECRET,
                 { expiresIn: '15m' } // Adjusted from 15s for practical use
             );
-
+            res.setHeader('Authorization', `Bearer ${accessToken}`);
             res.json({ accessToken });
         });
     } catch (error) {
