@@ -81,11 +81,11 @@ app.post('/meal', verifyTokenAdmin, upload.single('image'), async (req, res) => 
     });
     
     console.log(formData);
-    console.log(JSON.stringify(formData.ingredients));
+    console.log(JSON.parse(formData.ingredients));
     
     if (Array.isArray(JSON.parse(formData.ingredients)) && JSON.parse(formData.ingredients).length > 0) {
       try {
-        const ingredientPromises = formData.ingredients.map(async (ingredient) => {
+        const ingredientPromises = JSON.parse(formData.ingredients).map(async (ingredient) => {
           console.log(ingredient);
           const ing = await Ingredient.create({ name: ingredient.name, measure: ingredient.measure, quantity: ingredient.quantity });
           return meal.addIngredient(ing);
