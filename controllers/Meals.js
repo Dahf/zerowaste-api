@@ -54,7 +54,7 @@ export const getMeal = async (req, res) => {
           const ingredientConditions = translatedIngredients.map(translatedIngredient => {
               return {
                   name: {
-                      [Op.iLike]: `%${translatedIngredient}%`
+                      [Op.iLike]: `%asdads%`
                   }
               };
           });
