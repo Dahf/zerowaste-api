@@ -21,75 +21,75 @@ async function translateText(text, targetLang, sourceLang = 'auto') {
     return data.translatedText;
 }
 
-export const getMeal = async(req, res) => {
-    const { ingredient, lan, id } = req.query;
-    try {
-      if(id){
-        const result = await Meal.findByPk(id, {
-          include: {
-            model: Ingredient,
-            through: {
-              model: MealIngredient
-            }
-          }
-        });
-        res.json(result);
-        return;
+export const getMeal = async (req, res) => {
+  const { ingredient, lan, id } = req.query;
+  try {
+      if (id) {
+          const result = await Meal.findByPk(id, {
+              include: {
+                  model: Ingredient,
+                  through: {
+                      model: MealIngredient
+                  }
+              }
+          });
+          res.json(result);
+          return;
       }
+
       let foundItems;
-  
+
       if (ingredient) {
-        // Zutaten in ein Array aufteilen
-        const ingredientsArray = ingredient.split(',').map(ing => ing.trim());
-        
-        // Zutaten übersetzen und in ein neues Array speichern
-        const translatedIngredients = await Promise.all(
-          ingredientsArray.map(async ing => await translateText(ing, "en"))
-        );
-  
-        // Bedingungen für jede übersetzte Zutat erstellen
-        const ingredientConditions = translatedIngredients.map(translatedIngredient => ({
-          name: { [Op.iLike]: '%' + translatedIngredient + '%' }
-        }));
-  
-        console.log("Bedingungen mit JSON.stringify:");
-        console.log(JSON.stringify({ [Op.and]: ingredientConditions }, null, 2));
+          const ingredientsArray = ingredient.split(',').map(ing => ing.trim());
+          const translatedIngredients = await Promise.all(
+              ingredientsArray.map(async ing => await translateText(ing, "en"))
+          );
 
-        console.log("Einzelne Bedingungen:");
-        ingredientConditions.forEach(condition => {
-            console.log(JSON.stringify(condition, null, 2));
-        });
+          console.log("Translated Ingredients:");
+          translatedIngredients.forEach(condition => {
+              console.log(JSON.stringify(condition, null, 2));
+          });
 
-        console.log("Translated Ingredients:");
-        translatedIngredients.forEach(condition => {
-            console.log(JSON.stringify(condition, null, 2));
-        });
-  
-        foundItems = await Meal.findAll({
-          include: [{
-            model: Ingredient,
-            required: !!translatedIngredients.length,
-          }, {
-            required: !!translatedIngredients.length,
-            model: Ingredient,
-            as: "tagFilter",
-            where: {
-              [Op.and]: ingredientConditions
-            }
-          }],
-        });
+          const ingredientConditions = translatedIngredients.map(translatedIngredient => {
+              const condition = {
+                  name: { [Op.iLike]: '%' + translatedIngredient + '%' }
+              };
+              console.log("Created Condition:", JSON.stringify(condition, null, 2));
+              return condition;
+          });
+
+          console.log("Bedingungen mit JSON.stringify:");
+          console.log(JSON.stringify({ [Op.and]: ingredientConditions }, null, 2));
+
+          console.log("Einzelne Bedingungen:");
+          ingredientConditions.forEach(condition => {
+              console.log(JSON.stringify(condition, null, 2));
+          });
+
+          foundItems = await Meal.findAll({
+              include: [{
+                  model: Ingredient,
+                  required: true, // required should be true if there are ingredients
+              }, {
+                  model: Ingredient,
+                  as: "tagFilter",
+                  required: true, // required should be true if there are ingredients
+                  where: {
+                      [Op.and]: ingredientConditions
+                  }
+              }],
+          });
       } else {
-        foundItems = await Meal.findAll({
-          include: [{
-            required: !!ingredient,
-            model: Ingredient,
-          }],
-        });
+          foundItems = await Meal.findAll({
+              include: [{
+                  model: Ingredient,
+                  required: false,
+              }],
+          });
       }
-      
-      // Ergebnisse zurückgeben
+
       res.json(foundItems);
-    } catch (error) {
+  } catch (error) {
       res.status(500).send('Server error: ' + error.message);
-    }
-}
+  }
+};
