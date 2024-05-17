@@ -1,6 +1,6 @@
 import Meal from "../models/Meals.js";
 import Ingredient from "../models/Ingredient.js";
-import { Op } from 'sequelize';
+import { Op, Sequelize } from 'sequelize';
 import MealIngredient from "../models/MealIngredients.js";
 
 async function translateText(text, targetLang, sourceLang = 'auto') {
