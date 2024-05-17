@@ -52,10 +52,6 @@ export const getMeal = async (req, res) => {
                 include: [{
                     model: Ingredient,
                     required: !!translatedIngredients.length,
-                }, {
-                    required: !!translatedIngredients.length,
-                    model: Ingredient,
-                    as: "tagFilter",
                     through: {
                         where: {        
                             name: { [Op.in]: translatedIngredients }
