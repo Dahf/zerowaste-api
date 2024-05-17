@@ -48,30 +48,30 @@ export const getMeal = async (req, res) => {
             const translatedIngredients = await Promise.all(
                 ingredientsArray.map(async ing => await translateText(ing, "en"))
             );
-            const options = {
-                attributes: [Sequelize.fn('DISTINCT', Sequelize.col('mealId'))],
+            const ingredientSubQueryOptions = {
+                attributes: [Sequelize.fn('DISTINCT', Sequelize.col('MealIngredient.ingredientId'))],
                 where: {
-                    name: {
+                    ingredientId: {
                         [Op.in]: translatedIngredients
                     }
                 }
-              };
-              
-              // Generate select subquery statement
-              const subQuery = db.getQueryInterface()
-                                 .queryGenerator
-                                 .selectQuery('MealIngredient', options, MealIngredient)
-                                 .slice(0, -1); // This is to remove semicolon(;)
+            };
+            
+            const ingredientSubQuery = db.sequelize.getQueryInterface()
+                .queryGenerator
+                .selectQuery('MealIngredients', ingredientSubQueryOptions, Ingredient)
+                .slice(0, -1); // Remove the semicolon
 
             foundItems = await Meal.findAll({
-                where: {
-                id: {
-                    [Op.in]: Sequelize.literal(`(${subQuery})`)
-                }
-                },
+                
                 include: [{
                     model: Ingredient,
                     required: !!translatedIngredients.length,
+                    where: {
+                        id: {
+                            [Op.in]: Sequelize.literal(`(${ingredientSubQuery})`)
+                        }
+                    },
                 }/*, {
                     required: !!translatedIngredients.length,
                     model: Ingredient,
