@@ -48,21 +48,17 @@ export const getMeal = async (req, res) => {
   
             // Suchabfrage nach Mahlzeiten mit den angegebenen Zutaten
             foundItems = await Meal.findAll({
-                include: [
-                  {
+                include: [{
                     model: Ingredient,
-                    as: 'tagFilter',
+                    required: !!translatedIngredients.length,
+                }, {
+                    required: !!translatedIngredients.length,
+                    model: Ingredient,
+                    as: "tagFilter",
                     where: {
-                      name: {
                         [Op.in]: translatedIngredients
-                      }
-                    },
-                    through: {
-                        attributes: []
-                    },
-                    required: true,
-                  }
-                ],
+                    }
+                    }],
               });
         } else {
             foundItems = await Meal.findAll({
