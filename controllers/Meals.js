@@ -67,7 +67,7 @@ export const getMeal = async (req, res) => {
                         name: { [Op.in]: translatedIngredients }
                     }*/
                 }],
-                group: ['meals.id'],
+                group: ['meals.id', 'ingredients.id'],
                 having: Sequelize.literal(`COUNT(DISTINCT "ingredients"."id") = ${translatedIngredients.length}`),
                 attributes: [
                 'id', 
