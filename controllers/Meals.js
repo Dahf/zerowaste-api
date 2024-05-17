@@ -67,7 +67,11 @@ export const getMeal = async (req, res) => {
                 .slice(0, -1); // Remove the semicolon
 
             foundItems = await Meal.findAll({
-                
+                where: {
+                    id: {
+                        [Op.in]: Sequelize.literal(`(${ingredientSubQuery})`)
+                    }
+                },
                 include: [{
                     model: Ingredient,
                     required: !!translatedIngredients.length,
@@ -75,11 +79,7 @@ export const getMeal = async (req, res) => {
                     model: Ingredient,
                     required: !!translatedIngredients.length,
                     as: "tagFilter",
-                    where: {
-                        id: {
-                            [Op.in]: Sequelize.literal(`(${ingredientSubQuery})`)
-                        }
-                    },
+                    
                 }/*, {
                     required: !!translatedIngredients.length,
                     model: Ingredient,
