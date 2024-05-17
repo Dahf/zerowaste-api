@@ -51,19 +51,13 @@ export const getMeal = async (req, res) => {
                 include: [
                   {
                     model: Ingredient,
-                    as: 'tagFilter',
                     where: {
                       name: {
                         [Op.in]: translatedIngredients
                       }
                     },
-                    through: {
-                      attributes: []
-                    }
                   }
                 ],
-                group: ['meals.id', 'tagFilter.id'],
-                having: Sequelize.literal(`COUNT(DISTINCT "tagFilter"."id") = ${translatedIngredients.length}`)
               });
         } else {
             foundItems = await Meal.findAll({
