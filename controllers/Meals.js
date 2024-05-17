@@ -56,6 +56,7 @@ export const getMeal = async (req, res) => {
                         [Op.in]: translatedIngredients
                       }
                     },
+                    required: true,
                   }
                 ],
               });
