@@ -49,7 +49,7 @@ export const getMeal = async (req, res) => {
                 ingredientsArray.map(async ing => await translateText(ing, "en"))
             );
             const ingredientSubQueryOptions = {
-                attributes: [Sequelize.fn('DISTINCT', Sequelize.col('MealIngredient.ingredientId'))],
+                attributes: [Sequelize.fn('DISTINCT', Sequelize.col('ingredientId'))],
                 where: {
                     ingredientId: {
                         [Op.in]: translatedIngredients
