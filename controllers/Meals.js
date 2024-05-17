@@ -49,18 +49,15 @@ export const getMeal = async (req, res) => {
                 ingredientsArray.map(async ing => await translateText(ing, "en"))
             );
 
-            // Ensure the translatedIngredients is an array of strings
-            const translatedNames = translatedIngredients.map(result => result.text);
-
 
             foundItems = await Meal.findAll({
                 where: {
                   id: {
                     [Op.in]: Sequelize.literal(`
                       (SELECT "mealId" FROM "MealIngredient" WHERE "ingredientId" IN 
-                      (SELECT "id" FROM "ingredient" WHERE "name" IN (${translatedNames.map(name => `'${name}'`).join(',')}))
+                      (SELECT "id" FROM "ingredient" WHERE "name" IN (${translatedIngredients.map(name => `'${name}'`).join(',')}))
                       GROUP BY "mealId"
-                      HAVING COUNT(DISTINCT "ingredientId") = ${translatedNames.length})
+                      HAVING COUNT(DISTINCT "ingredientId") = ${translatedIngredients.length})
                     `)
                   }
                 },
