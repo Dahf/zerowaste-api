@@ -57,7 +57,7 @@ export const getMeal = async (req, res) => {
                 }
             };
             
-            const ingredientSubQuery = db.sequelize.getQueryInterface()
+            const ingredientSubQuery = db.getQueryInterface()
                 .queryGenerator
                 .selectQuery('MealIngredients', ingredientSubQueryOptions, Ingredient)
                 .slice(0, -1); // Remove the semicolon
@@ -67,6 +67,10 @@ export const getMeal = async (req, res) => {
                 include: [{
                     model: Ingredient,
                     required: !!translatedIngredients.length,
+                },{
+                    model: Ingredient,
+                    required: !!translatedIngredients.length,
+                    as: "tagFilter",
                     where: {
                         id: {
                             [Op.in]: Sequelize.literal(`(${ingredientSubQuery})`)
