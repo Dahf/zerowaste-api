@@ -2,6 +2,7 @@ import Meal from "../models/Meals.js";
 import Ingredient from "../models/Ingredient.js";
 import { Op, Sequelize } from 'sequelize';
 import MealIngredient from "../models/MealIngredients.js";
+import db from "../config/Database.js";
 
 async function translateText(text, targetLang, sourceLang = 'auto') {
     const response = await fetch("https://translate.silasbeckmann.de/translate", {
@@ -47,28 +48,47 @@ export const getMeal = async (req, res) => {
             const translatedIngredients = await Promise.all(
                 ingredientsArray.map(async ing => await translateText(ing, "en"))
             );
+            const options = {
+                attributes: [Sequelize.fn('DISTINCT', Sequelize.col('mealId'))],
+                where: {
+                    name: {
+                        [Op.in]: translatedIngredients
+                    }
+                }
+              };
+              
+              // Generate select subquery statement
+              const subQuery = db.getQueryInterface()
+                                 .queryGenerator
+                                 .selectQuery('MealIngredient', options, MealIngredient)
+                                 .slice(0, -1); // This is to remove semicolon(;)
 
             foundItems = await Meal.findAll({
+                where: {
+                id: {
+                    [Op.in]: Sequelize.literal(`(${subQuery})`)
+                }
+                },
                 include: [{
                     model: Ingredient,
                     required: !!translatedIngredients.length,
-                }, {
+                }/*, {
                     required: !!translatedIngredients.length,
                     model: Ingredient,
                     as: "tagFilter",
-                    where: {
+                    /*where: {
                         name: {
                             [Op.in]: translatedIngredients
                         }
-                    }
+                    }*/
                     
                     
                     /*where: {
                         name: { [Op.in]: translatedIngredients }
-                    }*/
-                }],
-                group: ['meals.id', 'ingredients.id', 'ingredients->MealIngredient.mealId'],
-                having: Sequelize.literal(`COUNT(DISTINCT "ingredients"."id") = ${translatedIngredients.length}`),
+                    }
+                }*/],
+                /*group: ['meals.id', 'ingredients.id', 'ingredients->MealIngredient.mealId'],
+                having: Sequelize.literal(`COUNT(DISTINCT "ingredients"."id") = ${translatedIngredients.length}`),*/
             });
         } else {
             foundItems = await Meal.findAll({
