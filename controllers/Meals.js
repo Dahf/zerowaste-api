@@ -61,10 +61,12 @@ export const getMeal = async (req, res) => {
             console.log("Ingredient Conditions:");
             console.log(JSON.stringify(ingredientConditions, null, 2));
   
+            // Suchabfrage nach Mahlzeiten mit den angegebenen Zutaten
             foundItems = await Meal.findAll({
                 include: [
                     {
                         model: Ingredient,
+                        as: 'Ingredients', // Hier wird der Alias explizit angegeben
                         required: true,
                         where: {
                             [Op.or]: ingredientConditions
@@ -75,7 +77,7 @@ export const getMeal = async (req, res) => {
                     }
                 ],
                 group: ['Meal.id'],
-                having: Sequelize.literal(`COUNT(DISTINCT "ingredient"."id") = ${ingredientConditions.length}`),
+                having: Sequelize.literal(`COUNT(DISTINCT "Ingredients"."id") = ${ingredientConditions.length}`),
             });
         } else {
             foundItems = await Meal.findAll({
