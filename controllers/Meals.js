@@ -56,12 +56,11 @@ export const getMeal = async (req, res) => {
                     required: !!translatedIngredients.length,
                     model: Ingredient,
                     as: "tagFilter",
-                    where: {       
-                        [Op.and]: {
-                            name: { [Op.iLike]: translatedIngredients[0] },
-                            name: { [Op.iLike]: translatedIngredients[1] },
-                        }
-                    } 
+                    where: {
+                        [Op.and]: translatedIngredients.map(ingredient => ({
+                            name: { [Op.iLike]: ingredient }
+                        }))
+                    }
                     
                     
                     /*where: {
