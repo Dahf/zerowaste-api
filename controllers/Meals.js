@@ -67,7 +67,7 @@ export const getMeal = async (req, res) => {
                 id: {
                 [Op.in]: Sequelize.literal(`
                     (SELECT "mealId" FROM "MealIngredient" WHERE "ingredientId" IN 
-                    (SELECT "id" FROM "Ingredients" WHERE "name" IN ('Ham', 'Cheese'))
+                    (SELECT "id" FROM "ingredient" WHERE "name" IN ('Ham', 'Cheese'))
                     GROUP BY "mealId"
                     HAVING COUNT(DISTINCT "ingredientId") = 2)
                 `)
