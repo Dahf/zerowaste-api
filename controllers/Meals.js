@@ -59,7 +59,7 @@ export const getMeal = async (req, res) => {
                       [Op.in]: Sequelize.literal(`
                         SELECT "mealId" FROM (${subqueries}) AS "intersectedMeals"
                         GROUP BY "mealId"
-                        HAVING COUNT(DISTINCT "ingredientId") = ${translatedNames.length}
+                        HAVING COUNT(DISTINCT "ingredientId") = ${translatedIngredients.length}
                       `)
                     }
                   },
