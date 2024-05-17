@@ -61,22 +61,24 @@ export const getMeal = async (req, res) => {
                 .queryGenerator
                 .selectQuery('MealIngredient', ingredientSubQueryOptions, Ingredient)
                 .slice(0, -1); // Remove the semicolon
+
             const mealsWithHamAndCheese = await Meal.findAll({
-                    include: [
-                      {
-                        model: Ingredient,
-                        where: {
-                          name: {
-                            [Op.in]: ['Ham', 'Cheese']
-                          }
-                        },
-                        through: {
-                          attributes: []  // exclude MealIngredient attributes
-                        }
-                      }
-                    ],
-                    group: ['meals.id'],  // Group by Meal to handle the join correctly
-                    having: Sequelize.literal('COUNT(DISTINCT `ingredient`.`id`) = 2')  // Ensure both ingredients are included
+            where: {
+                id: {
+                [Op.in]: Sequelize.literal(`
+                    (SELECT "mealId" FROM "MealIngredients" WHERE "ingredientId" IN 
+                    (SELECT "id" FROM "Ingredients" WHERE "name" IN ('Ham', 'Cheese'))
+                    GROUP BY "mealId"
+                    HAVING COUNT(DISTINCT "ingredientId") = 2)
+                `)
+                }
+            },
+            include: [
+                {
+                model: Ingredient,
+                through: { attributes: [] }  // exclude MealIngredient attributes
+                }
+            ]
             });
             res.json(mealsWithHamAndCheese);
             return;
