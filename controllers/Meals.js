@@ -51,9 +51,9 @@ export const getMeal = async (req, res) => {
             foundItems = await Meal.findAll({
                 include: [{
                     model: Ingredient,
-                    required: !!translatedIngredients.length,
+                    required: false,
                 }, {
-                    required: !!translatedIngredients.length,
+                    required: false,
                     model: Ingredient,
                     as: "tagFilter",
                     where: {
