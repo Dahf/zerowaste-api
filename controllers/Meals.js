@@ -49,23 +49,18 @@ export const getMeal = async (req, res) => {
                 ingredientsArray.map(async ing => await translateText(ing, "en"))
             );
 
-            const likeConditions = translatedIngredients.map(name => `"name" iLike '%${name}%'`).join(' OR ');
-
 
             foundItems = await Meal.findAll({
                 where: {
-                  id: {
-                    [Op.in]: Sequelize.literal(`
-                    SELECT "mealId" FROM "MealIngredient" 
-                    WHERE "ingredientId" IN (
-                        SELECT "id" FROM "ingredient" 
-                        WHERE ${likeConditions}
-                    )
-                    GROUP BY "mealId"
-                    HAVING COUNT(DISTINCT "ingredientId") = ${translatedIngredients.length}
-                    `)
-                  }
-                },
+                    id: {
+                      [Op.in]: Sequelize.literal(`
+                        (SELECT "mealId" FROM "MealIngredient" WHERE "ingredientId" IN 
+                        (SELECT "id" FROM "ingredient" WHERE ${translatedIngredients.map(name => `"name" ILIKE '%${name}%'`).join(' OR ')})
+                        GROUP BY "mealId"
+                        HAVING COUNT(DISTINCT "ingredientId") = ${translatedIngredients.length})
+                      `)
+                    }
+                  },
                 include: [
                   {
                     model: Ingredient,
