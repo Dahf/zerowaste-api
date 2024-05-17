@@ -44,48 +44,33 @@ export const getMeal = async (req, res) => {
             const translatedIngredients = await Promise.all(
                 ingredientsArray.map(async ing => await translateText(ing, "en"))
             );
-  
-            console.log("Translated Ingredients:");
-            translatedIngredients.forEach(translatedIngredient => {
-                console.log(translatedIngredient);
-            });
-  
-            // Erstellung der Bedingungen
-            const ingredientConditions = translatedIngredients.map(translatedIngredient => ({
-                name: {
-                    [Op.iLike]: `%${translatedIngredient}%`
-                }
-            }));
-  
-            // Ausgabe der erstellten Bedingungen
-            console.log("Ingredient Conditions:");
-            console.log(JSON.stringify(ingredientConditions, null, 2));
+
   
             // Suchabfrage nach Mahlzeiten mit den angegebenen Zutaten
             foundItems = await Meal.findAll({
                 include: [
-                    {
-                        model: Ingredient,
-                        as: 'tagFilter', // Verwende den Alias tagFilter
-                        required: true,
-                        where: {
-                            [Op.or]: ingredientConditions
-                        },
-                        through: {
-                            attributes: []
-                        }
+                  {
+                    model: Ingredient,
+                    as: 'tagFilter',
+                    where: {
+                      name: {
+                        [Op.in]: translatedIngredients
+                      }
+                    },
+                    through: {
+                      attributes: []
                     }
+                  }
                 ],
                 group: ['meals.id', 'tagFilter.id'],
-                having: Sequelize.literal(`COUNT(DISTINCT "tagFilter"."id") = ${ingredientConditions.length}`),
-            });
+                having: Sequelize.literal(`COUNT(DISTINCT "tagFilter"."id") = ${ingredientNames.length}`)
+              });
         } else {
             foundItems = await Meal.findAll({
                 include: [
                     {
                         model: Ingredient,
-                        as: 'tagFilter', // Alias hinzufügen
-                        required: false,
+                        required: true,
                     }
                 ],
             });
