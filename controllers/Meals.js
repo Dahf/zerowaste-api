@@ -46,23 +46,24 @@ export const getMeal = async (req, res) => {
 
             // Translate each ingredient
             const translatedIngredients = await Promise.all(
-                ingredientsArray.map(async ing => await translateText(ing, "en"))
+                ingredientsArray.map(async ing => {
+                    const translated = await translateText(ing, "en");
+                    return translated.toLowerCase();
+                })
             );
 
-            const subqueries = translatedIngredients.map(name => `
-                SELECT "mealId" FROM "MealIngredient" WHERE "ingredientId" IN 
-                (SELECT "id" FROM "ingredient" WHERE "name" iLike '%${name}%')
-            `).join(' INTERSECT ');
+
             foundItems = await Meal.findAll({
                 where: {
-                    id: {
-                      [Op.in]: Sequelize.literal(`
-                        SELECT "mealId" FROM (${subqueries}) AS "intersectedMeals"
-                        GROUP BY "mealId"
-                        HAVING COUNT(DISTINCT "ingredientId") = ${translatedIngredients.length}
-                      `)
-                    }
-                  },
+                  id: {
+                    [Op.in]: Sequelize.literal(`
+                      (SELECT "mealId" FROM "MealIngredient" WHERE "ingredientId" IN 
+                      (SELECT "id" FROM "ingredient" WHERE "name" IN (${translatedIngredients.map(name => `'${name}'`).join(',')}))
+                      GROUP BY "mealId"
+                      HAVING COUNT(DISTINCT "ingredientId") = ${translatedIngredients.length})
+                    `)
+                  }
+                },
                 include: [
                   {
                     model: Ingredient,
