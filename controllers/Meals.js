@@ -56,13 +56,16 @@ export const getMeal = async (req, res) => {
                     required: !!translatedIngredients.length,
                     model: Ingredient,
                     as: "tagFilter",
+                    through: {
+                        where: {        
+                            name: { [Op.in]: translatedIngredients }
+                            } 
+                        }
+                    
                     /*where: {
                         name: { [Op.in]: translatedIngredients }
                     }*/
                 }],
-                where: translatedIngredients.length ? {
-                    '$tagFilter.name$': { [Op.in]: translatedIngredients }
-                } : {}
             });
         } else {
             foundItems = await Meal.findAll({
