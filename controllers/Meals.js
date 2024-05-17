@@ -54,7 +54,7 @@ export const getMeal = async (req, res) => {
           const ingredientConditions = translatedIngredients.map(translatedIngredient => {
               return {
                   name: {
-                      [Op.iLike]: `%asdads%`
+                      [Op.iLike]: `%${translatedIngredient}%`
                   }
               };
           });
@@ -74,7 +74,7 @@ export const getMeal = async (req, res) => {
                       as: "tagFilter",
                       required: true, // required should be true if there are ingredients
                       where: {
-                          [Op.and]: ingredientConditions
+                          ingredientConditions
                       }
                   }
               ],
