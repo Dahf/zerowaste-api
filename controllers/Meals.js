@@ -76,7 +76,7 @@ export const getMeal = async (req, res) => {
                         }
                     }
                 ],
-                //group: ['Meal.id'],
+                group: ['meals.id'],
                 having: Sequelize.literal(`COUNT(DISTINCT "tagFilter"."id") = ${ingredientConditions.length}`),
             });
         } else {
