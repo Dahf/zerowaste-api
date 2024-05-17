@@ -66,7 +66,7 @@ export const getMeal = async (req, res) => {
                 include: [
                     {
                         model: Ingredient,
-                        as: 'IngredientAlias', // Hier wird der Alias explizit angegeben
+                        as: 'tagFilter', // Verwende den Alias tagFilter
                         required: true,
                         where: {
                             [Op.or]: ingredientConditions
@@ -77,14 +77,14 @@ export const getMeal = async (req, res) => {
                     }
                 ],
                 group: ['Meal.id'],
-                having: Sequelize.literal(`COUNT(DISTINCT "IngredientAlias"."id") = ${ingredientConditions.length}`),
+                having: Sequelize.literal(`COUNT(DISTINCT "tagFilter"."id") = ${ingredientConditions.length}`),
             });
         } else {
             foundItems = await Meal.findAll({
                 include: [
                     {
                         model: Ingredient,
-                        as: 'IngredientAlias', // Alias hinzufügen
+                        as: 'tagFilter', // Alias hinzufügen
                         required: false,
                     }
                 ],
