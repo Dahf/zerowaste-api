@@ -57,8 +57,8 @@ export const getMeal = async (req, res) => {
                     model: Ingredient,
                     as: "tagFilter",
                     where: {        
-                        name: { [Op.in]: translatedIngredients }
-                        } 
+                        name: { [Op.iLike]: translatedIngredients[0] },
+                    } 
                     
                     
                     /*where: {
