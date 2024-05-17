@@ -51,10 +51,14 @@ export const getMeal = async (req, res) => {
                 include: [
                   {
                     model: Ingredient,
+                    as: 'tagFilter',
                     where: {
                       name: {
                         [Op.in]: translatedIngredients
                       }
+                    },
+                    through: {
+                        attributes: []
                     },
                     required: true,
                   }
