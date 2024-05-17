@@ -79,6 +79,7 @@ export const getMeal = async (req, res) => {
                     having: Sequelize.literal('COUNT(DISTINCT `ingredient`.`id`) = 2')  // Ensure both ingredients are included
             });
             res.json(mealsWithHamAndCheese);
+            return;
             /*
             foundItems = await Meal.findAll({
                 
