@@ -59,7 +59,7 @@ export const getMeal = async (req, res) => {
             
             const ingredientSubQuery = db.getQueryInterface()
                 .queryGenerator
-                .selectQuery('MealIngredients', ingredientSubQueryOptions, Ingredient)
+                .selectQuery('MealIngredient', ingredientSubQueryOptions, Ingredient)
                 .slice(0, -1); // Remove the semicolon
 
             foundItems = await Meal.findAll({
