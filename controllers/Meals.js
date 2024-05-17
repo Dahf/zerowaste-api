@@ -61,7 +61,25 @@ export const getMeal = async (req, res) => {
                 .queryGenerator
                 .selectQuery('MealIngredient', ingredientSubQueryOptions, Ingredient)
                 .slice(0, -1); // Remove the semicolon
-
+            const mealsWithHamAndCheese = await Meal.findAll({
+                    include: [
+                      {
+                        model: Ingredient,
+                        where: {
+                          name: {
+                            [Op.in]: ['Ham', 'Cheese']
+                          }
+                        },
+                        through: {
+                          attributes: []  // exclude MealIngredient attributes
+                        }
+                      }
+                    ],
+                    group: ['Meal.id'],  // Group by Meal to handle the join correctly
+                    having: Sequelize.literal('COUNT(DISTINCT `Ingredients`.`id`) = 2')  // Ensure both ingredients are included
+            });
+            res.json(mealsWithHamAndCheese);
+            /*
             foundItems = await Meal.findAll({
                 
                 include: [{
@@ -90,10 +108,10 @@ export const getMeal = async (req, res) => {
                     /*where: {
                         name: { [Op.in]: translatedIngredients }
                     }
-                }*/],
+                }],*/
                 /*group: ['meals.id', 'ingredients.id', 'ingredients->MealIngredient.mealId'],
                 having: Sequelize.literal(`COUNT(DISTINCT "ingredients"."id") = ${translatedIngredients.length}`),*/
-            });
+            /*});*/
         } else {
             foundItems = await Meal.findAll({
                 include: [
