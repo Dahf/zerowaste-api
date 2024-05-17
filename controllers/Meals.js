@@ -62,7 +62,7 @@ export const getMeal = async (req, res) => {
                         WHERE ${likeConditions}
                     )
                     GROUP BY "mealId"
-                    HAVING COUNT(DISTINCT "ingredientId") = ${translatedNames.length}
+                    HAVING COUNT(DISTINCT "ingredientId") = ${translatedIngredients.length}
                     `)
                   }
                 },
