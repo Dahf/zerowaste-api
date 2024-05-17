@@ -40,51 +40,27 @@ export const getMeal = async (req, res) => {
         let foundItems;
   
         if (ingredient) {
-            try {
-                // Ensure ingredient is a string
-                if (typeof ingredient !== 'string') {
-                    throw new Error(`Expected a string for ingredient, but got ${typeof ingredient}`);
-                }
-            
-                // Log the received ingredient
-                console.log("Received ingredient:", ingredient);
-            
-                // Split the ingredient string into an array and trim whitespace
-                const ingredientsArray = ingredient.split(',').map(ing => ing.trim());
-            
-                // Log the split and trimmed ingredients
-                console.log("Ingredients array:", ingredientsArray);
-            
-                // Translate each ingredient
-                const translatedIngredients = await Promise.all(
-                    ingredientsArray.map(async ing => await translateText(ing, "en"))
-                );
-            
-                // Log the translated ingredients
-                console.log("Translated ingredients:", translatedIngredients);
-            
-                // Search for meals with the given ingredients
-                foundItems = await Meal.findAll({
-                    include: [{
-                        model: Ingredient,
-                        required: !!translatedIngredients.length,
-                    }, {
-                        required: !!translatedIngredients.length,
-                        model: Ingredient,
-                        as: "tagFilter",
-                        where: {
-                            [Op.in]: translatedIngredients
-                        }
-                    }],
-                });
-            
-                // Log the found items
-                console.log("Found items:", foundItems);
-            
-            } catch (error) {
-                // Log any errors
-                console.error("Error processing ingredients:", error.message);
-            }
+
+            const ingredientsArray = ingredient.split(',').map(ing => ing.trim());
+        
+            // Translate each ingredient
+            const translatedIngredients = await Promise.all(
+                ingredientsArray.map(async ing => await translateText(ing, "en"))
+            );
+
+            foundItems = await Meal.findAll({
+                include: [{
+                    model: Ingredient,
+                    required: !!translatedIngredients.length,
+                }, {
+                    required: !!translatedIngredients.length,
+                    model: Ingredient,
+                    as: "tagFilter",
+                    where: {
+                        name: { [Op.in]: translatedIngredients }
+                    }
+                }],
+            });
         } else {
             foundItems = await Meal.findAll({
                 include: [
