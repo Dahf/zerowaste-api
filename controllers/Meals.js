@@ -75,8 +75,8 @@ export const getMeal = async (req, res) => {
                         }
                       }
                     ],
-                    group: ['Meal.id'],  // Group by Meal to handle the join correctly
-                    having: Sequelize.literal('COUNT(DISTINCT `Ingredients`.`id`) = 2')  // Ensure both ingredients are included
+                    group: ['meals.id'],  // Group by Meal to handle the join correctly
+                    having: Sequelize.literal('COUNT(DISTINCT `ingredient`.`id`) = 2')  // Ensure both ingredients are included
             });
             res.json(mealsWithHamAndCheese);
             /*
