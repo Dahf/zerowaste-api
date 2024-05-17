@@ -22,76 +22,74 @@ async function translateText(text, targetLang, sourceLang = 'auto') {
 }
 
 export const getMeal = async (req, res) => {
-  const { ingredient, lan, id } = req.query;
-  try {
-      if (id) {
-          const result = await Meal.findByPk(id, {
-              include: {
-                  model: Ingredient,
-                  through: {
-                      model: MealIngredient
-                  }
-              }
-          });
-          res.json(result);
-          return;
-      }
-
-      let foundItems;
-
-      if (ingredient) {
-          const ingredientsArray = ingredient.split(',').map(ing => ing.trim());
-          const translatedIngredients = await Promise.all(
-              ingredientsArray.map(async ing => await translateText(ing, "en"))
-          );
-
-          console.log("Translated Ingredients:");
-          translatedIngredients.forEach(translatedIngredient => {
-              console.log(translatedIngredient); // Direkte Ausgabe der übersetzten Zutaten
-          });
-
-          // Erstellung der Bedingungen
-          const ingredientConditions = translatedIngredients.map(translatedIngredient => {
-              return {
-                  name: {
-                      [Op.iLike]: `%${translatedIngredient}%`
-                  }
-              };
-          });
-
-          // Ausgabe der erstellten Bedingungen
-          console.log("Ingredient Conditions:");
-          console.log(JSON.stringify(ingredientConditions, null, 2));
-
-          foundItems = await Meal.findAll({
-              include: [
-                  {
-                      model: Ingredient,
-                      required: true, // required should be true if there are ingredients
-                  },
-                  {
-                      model: Ingredient,
-                      as: "tagFilter",
-                      required: true, // required should be true if there are ingredients
-                      where: {
-                          ingredientConditions
-                      }
-                  }
-              ],
-          });
-      } else {
-          foundItems = await Meal.findAll({
-              include: [
-                  {
-                      model: Ingredient,
-                      required: false,
-                  }
-              ],
-          });
-      }
-
-      res.json(foundItems);
-  } catch (error) {
-      res.status(500).send('Server error: ' + error.message);
-  }
-};
+    const { ingredient, lan, id } = req.query;
+    try {
+        if (id) {
+            const result = await Meal.findByPk(id, {
+                include: {
+                    model: Ingredient,
+                    through: {
+                        model: MealIngredient
+                    }
+                }
+            });
+            res.json(result);
+            return;
+        }
+  
+        let foundItems;
+  
+        if (ingredient) {
+            const ingredientsArray = ingredient.split(',').map(ing => ing.trim());
+            const translatedIngredients = await Promise.all(
+                ingredientsArray.map(async ing => await translateText(ing, "en"))
+            );
+  
+            console.log("Translated Ingredients:");
+            translatedIngredients.forEach(translatedIngredient => {
+                console.log(translatedIngredient);
+            });
+  
+            // Erstellung der Bedingungen
+            const ingredientConditions = translatedIngredients.map(translatedIngredient => ({
+                name: {
+                    [Op.iLike]: `%${translatedIngredient}%`
+                }
+            }));
+  
+            // Ausgabe der erstellten Bedingungen
+            console.log("Ingredient Conditions:");
+            console.log(JSON.stringify(ingredientConditions, null, 2));
+  
+            foundItems = await Meal.findAll({
+                include: [
+                    {
+                        model: Ingredient,
+                        required: true,
+                        where: {
+                            [Op.or]: ingredientConditions
+                        },
+                        through: {
+                            attributes: []
+                        }
+                    }
+                ],
+                group: ['Meal.id'],
+                having: Sequelize.literal(`COUNT(DISTINCT "Ingredients"."id") = ${ingredientConditions.length}`),
+            });
+        } else {
+            foundItems = await Meal.findAll({
+                include: [
+                    {
+                        model: Ingredient,
+                        required: false,
+                    }
+                ],
+            });
+        }
+  
+        res.json(foundItems);
+    } catch (error) {
+        res.status(500).send('Server error: ' + error.message);
+    }
+  };
