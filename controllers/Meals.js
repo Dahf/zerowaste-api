@@ -67,6 +67,8 @@ export const getMeal = async (req, res) => {
                         name: { [Op.in]: translatedIngredients }
                     }*/
                 }],
+                group: ['meal.id'],
+                having: Sequelize.literal(`COUNT(DISTINCT "ingredients"."id") = ${translatedIngredients.length}`),
             });
         } else {
             foundItems = await Meal.findAll({
