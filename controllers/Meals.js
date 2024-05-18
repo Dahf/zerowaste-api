@@ -86,7 +86,7 @@ export const getMeal = async (req, res) => {
     }
   };
 
-  async function getTopGenericName(specificIngredients) {
+  export const getTopGenericName = async(specificIngredients) => {
     const ingredientCounts = {};
   
     for (const ingredientName of specificIngredients) {
@@ -119,13 +119,3 @@ export const getMeal = async (req, res) => {
   
     return topGenericName;
   }
-  
-  app.get('/top-generic-name', async (req, res) => {
-    const specificIngredients = req.query.ingredients.split(',');
-    try {
-      const topGenericName = await getTopGenericName(specificIngredients);
-      res.json({ topGenericName });
-    } catch (error) {
-      res.status(500).json({ error: error.message });
-    }
-  });
