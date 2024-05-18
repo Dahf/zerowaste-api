@@ -23,7 +23,7 @@ async function translateText(text, targetLang, sourceLang = 'auto') {
 }
 
 export const getMeal = async (req, res) => {
-    const { ingredients, lan, id } = req.query;
+    const { lan, id } = req.query;
     try {
         if (id) {
             const result = await Meal.findByPk(id, {
@@ -40,9 +40,9 @@ export const getMeal = async (req, res) => {
   
         let foundItems;
   
-        if (ingredients) {
+        if (req.query.ingredients) {
 
-            const ingredientsArray = ingredients.split(',').map(ing => ing.trim());
+            const ingredientsArray = req.query.ingredients.split(',').map(ing => ing.trim());
 
             // Translate each ingredient
             const translatedIngredients = await Promise.all(
