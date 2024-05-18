@@ -92,7 +92,13 @@ export const getTopGenericName = async(specificIngredients) => {
     for (const ingredientName of specificIngredients) {
       try {
         // Finden aller Zutaten mit dem spezifischen Namen
-        const ingredients = await Ingredient.findAll({ where: { name: ingredientName } });
+        const ingredients = await Ingredient.findAll({
+            where: {
+              name: {
+                [Op.iLike]: `%${ingredientName}%`
+              }
+            }
+          });
         
         if (!ingredients.length) {
           console.log(`Keine Zutaten gefunden für: ${ingredientName}`);
