@@ -86,36 +86,34 @@ export const getMeal = async (req, res) => {
     }
   };
 
-  export const getTopGenericName = async(specificIngredients) => {
-    const ingredientCounts = {};
-  
-    for (const ingredientName of specificIngredients) {
-      const ingredient = await Ingredient.findOne({ where: { name: ingredientName } });
-      if (ingredient) {
-        const meals = await Meal.findAll({
-          include: {
-            model: Ingredient,
-            where: { id: ingredient.id }
-          }
-        });
-        if (meals) {
-          if (!ingredientCounts[ingredient.name]) {
-            ingredientCounts[ingredient.name] = 0;
-          }
-          ingredientCounts[ingredient.name] += meals.length;
+export const getTopGenericName = async(specificIngredients) => {
+  const ingredientCounts = {};
+
+  for (const ingredientName of specificIngredients) {
+    const ingredients = await Ingredient.findAll({ where: { name: ingredientName } });
+    for (const ingredient of ingredients) {
+      const result = await Meal.findAndCountAll({
+        include: {
+          model: Ingredient,
+          where: { id: ingredient.id }
         }
+      });
+      if (!ingredientCounts[ingredient.name]) {
+        ingredientCounts[ingredient.name] = 0;
       }
+      ingredientCounts[ingredient.name] += result.count;
     }
-  
-    // Finden des generischen Namens mit den meisten Mahlzeiten
-    let topGenericName = null;
-    let maxCount = 0;
-    for (const [ingredientName, count] of Object.entries(ingredientCounts)) {
-      if (count > maxCount) {
-        maxCount = count;
-        topGenericName = ingredientName;
-      }
-    }
-  
-    return topGenericName;
   }
+
+  // Finden des generischen Namens mit den meisten Mahlzeiten
+  let topGenericName = null;
+  let maxCount = 0;
+  for (const [ingredientName, count] of Object.entries(ingredientCounts)) {
+    if (count > maxCount) {
+      maxCount = count;
+      topGenericName = ingredientName;
+    }
+  }
+
+  return topGenericName;
+}
