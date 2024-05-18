@@ -68,6 +68,7 @@ app.post('/meal', verifyTokenAdmin, upload.single('image'), async (req, res) => 
 
     const meal = await Meal.create({
       name: formData.name,
+      category: formData.category,
       description: formData.description,
       servingSize: formData.servingSize,
       calories: formData.calories,

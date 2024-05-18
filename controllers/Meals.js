@@ -49,8 +49,6 @@ export const getMeal = async (req, res) => {
             const translatedIngredients = await Promise.all(
                 ingredientsArray.map(async ing => await translateText(ing, "en"))
             );
-            console.log(translatedIngredients);
-
 
             foundItems = await Meal.findAll({
                 where: {
