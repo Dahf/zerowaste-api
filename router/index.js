@@ -19,9 +19,15 @@ router.get('/token', refreshToken);
 router.delete('/logout', Logout);
 router.get('/meals', getMeal);
 router.get('/top-generic-name', async (req, res) => {
-   const specificIngredients = req.query.ingredients.trim().split(',');
+   
+   const ingredientsArray = req.query.ingredients.split(',').map(ing => ing.trim());
+
+   const translatedIngredients = await Promise.all(
+      ingredientsArray.map(async ing => await translateText(ing, "en"))
+  );
+
    try {
-     const topGenericName = await getTopGenericName(specificIngredients);
+     const topGenericName = await getTopGenericName(translatedIngredients);
      res.json({ topGenericName });
    } catch (error) {
      res.status(500).json({ error: error.message });

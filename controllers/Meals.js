@@ -88,7 +88,7 @@ export const getMeal = async (req, res) => {
 
 export const getTopGenericName = async(specificIngredients) => {
     const ingredientCounts = {};
-
+    
     for (const ingredientName of specificIngredients) {
       try {
         // Finden aller Zutaten mit dem spezifischen Namen
