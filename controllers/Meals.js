@@ -85,3 +85,47 @@ export const getMeal = async (req, res) => {
         res.status(500).send('Server error: ' + error.message);
     }
   };
+
+  async function getTopGenericName(specificIngredients) {
+    const ingredientCounts = {};
+  
+    for (const ingredientName of specificIngredients) {
+      const ingredient = await Ingredient.findOne({ where: { name: ingredientName } });
+      if (ingredient) {
+        const meals = await Meal.findAll({
+          include: {
+            model: Ingredient,
+            where: { id: ingredient.id }
+          }
+        });
+        if (meals) {
+          if (!ingredientCounts[ingredient.name]) {
+            ingredientCounts[ingredient.name] = 0;
+          }
+          ingredientCounts[ingredient.name] += meals.length;
+        }
+      }
+    }
+  
+    // Finden des generischen Namens mit den meisten Mahlzeiten
+    let topGenericName = null;
+    let maxCount = 0;
+    for (const [ingredientName, count] of Object.entries(ingredientCounts)) {
+      if (count > maxCount) {
+        maxCount = count;
+        topGenericName = ingredientName;
+      }
+    }
+  
+    return topGenericName;
+  }
+  
+  app.get('/top-generic-name', async (req, res) => {
+    const specificIngredients = req.query.ingredients.split(',');
+    try {
+      const topGenericName = await getTopGenericName(specificIngredients);
+      res.json({ topGenericName });
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  });
