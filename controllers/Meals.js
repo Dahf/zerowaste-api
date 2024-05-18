@@ -87,33 +87,50 @@ export const getMeal = async (req, res) => {
   };
 
 export const getTopGenericName = async(specificIngredients) => {
-  const ingredientCounts = {};
+    const ingredientCounts = {};
 
-  for (const ingredientName of specificIngredients) {
-    const ingredients = await Ingredient.findAll({ where: { name: ingredientName } });
-    for (const ingredient of ingredients) {
-      const result = await Meal.findAndCountAll({
-        include: {
-          model: Ingredient,
-          where: { id: ingredient.id }
+    for (const ingredientName of specificIngredients) {
+      try {
+        // Finden aller Zutaten mit dem spezifischen Namen
+        const ingredients = await Ingredient.findAll({ where: { name: ingredientName } });
+        
+        if (!ingredients.length) {
+          console.log(`Keine Zutaten gefunden für: ${ingredientName}`);
+          continue;
         }
-      });
-      if (!ingredientCounts[ingredient.name]) {
-        ingredientCounts[ingredient.name] = 0;
+  
+        for (const ingredient of ingredients) {
+          // Zählen der Mahlzeiten, die diese Zutat enthalten
+          const result = await Meal.findAndCountAll({
+            include: {
+              model: Ingredient,
+              where: { id: ingredient.id }
+            }
+          });
+  
+          console.log(`Gefundene Mahlzeiten für Zutat ${ingredient.name} (ID: ${ingredient.id}): ${result.count}`);
+  
+          if (!ingredientCounts[ingredient.name]) {
+            ingredientCounts[ingredient.name] = 0;
+          }
+          ingredientCounts[ingredient.name] += result.count;
+        }
+      } catch (error) {
+        console.error(`Fehler beim Abrufen der Zutaten für ${ingredientName}:`, error);
       }
-      ingredientCounts[ingredient.name] += result.count;
     }
-  }
-
-  // Finden des generischen Namens mit den meisten Mahlzeiten
-  let topGenericName = null;
-  let maxCount = 0;
-  for (const [ingredientName, count] of Object.entries(ingredientCounts)) {
-    if (count > maxCount) {
-      maxCount = count;
-      topGenericName = ingredientName;
+  
+    // Finden des generischen Namens mit den meisten Mahlzeiten
+    let topGenericName = null;
+    let maxCount = 0;
+    for (const [ingredientName, count] of Object.entries(ingredientCounts)) {
+      if (count > maxCount) {
+        maxCount = count;
+        topGenericName = ingredientName;
+      }
     }
+  
+    console.log(`Top generischer Name: ${topGenericName} mit ${maxCount} Mahlzeiten`);
+  
+    return topGenericName;
   }
-
-  return topGenericName;
-}

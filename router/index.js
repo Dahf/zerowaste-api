@@ -19,7 +19,7 @@ router.get('/token', refreshToken);
 router.delete('/logout', Logout);
 router.get('/meals', getMeal);
 router.get('/top-generic-name', async (req, res) => {
-   const specificIngredients = req.query.ingredients.split(',');
+   const specificIngredients = req.query.ingredients.trim().split(',');
    try {
      const topGenericName = await getTopGenericName(specificIngredients);
      res.json({ topGenericName });
