@@ -140,7 +140,7 @@ export const getTopGenericName = async(specificIngredients) => {
   
     return topGenericName;
   }
-  export const getAllUniqueCategories = async () => {
+  export const getAllUniqueCategories = async (req, res) => {
     try {
       const categories = await Meal.findAll({
         attributes: [
@@ -149,10 +149,10 @@ export const getTopGenericName = async(specificIngredients) => {
         raw: true
       });
       
-      // Extrahiert nur die Kategorie-Werte
-      return categories.map(cat => cat.category);
+      const uniqueCategories = categories.map(cat => cat.category);
+      res.json({ categories: uniqueCategories });
     } catch (error) {
       console.error('Error fetching categories:', error);
-      throw error;
+      res.status(500).json({ error: 'Internal Server Error' });
     }
   };
