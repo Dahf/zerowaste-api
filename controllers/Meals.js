@@ -144,7 +144,7 @@ export const getTopGenericName = async(specificIngredients) => {
     try {
       const categories = await Meal.findAll({
         attributes: [
-          [Meal.sequelize.fn('DISTINCT', MealModel.sequelize.col('category')), 'category']
+          [Meal.sequelize.fn('DISTINCT', Meal.sequelize.col('category')), 'category']
         ],
         raw: true
       });
