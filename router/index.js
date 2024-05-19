@@ -1,6 +1,6 @@
 import express from "express";
 import { verifyToken, verifyTokenAdmin } from "../middleware/VerifyToken.js";
-import { getMeal, getTopGenericName } from "../controllers/Meals.js";
+import { getAllUniqueCategories, getMeal, getTopGenericName } from "../controllers/Meals.js";
 import { Login, Logout, Register } from "../controllers/Users.js";
 import { refreshToken } from "../controllers/RefreshToken.js";
 
@@ -34,8 +34,10 @@ router.get("/status", (request, response) => {
 router.post('/login', Login);
 router.post('/register', Register);
 router.get('/token', refreshToken);
+router.get('/categories', getAllUniqueCategories);
 router.delete('/logout', Logout);
 router.get('/meals', getMeal);
+
 router.get('/top-generic-name', async (req, res) => {
 
    const ingredientsArray = req.query.ingredients.split(',').map(ing => ing.trim());

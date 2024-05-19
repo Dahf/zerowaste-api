@@ -140,3 +140,19 @@ export const getTopGenericName = async(specificIngredients) => {
   
     return topGenericName;
   }
+  export const getAllUniqueCategories = async () => {
+    try {
+      const categories = await Meal.findAll({
+        attributes: [
+          [Meal.sequelize.fn('DISTINCT', MealModel.sequelize.col('category')), 'category']
+        ],
+        raw: true
+      });
+      
+      // Extrahiert nur die Kategorie-Werte
+      return categories.map(cat => cat.category);
+    } catch (error) {
+      console.error('Error fetching categories:', error);
+      throw error;
+    }
+  };
