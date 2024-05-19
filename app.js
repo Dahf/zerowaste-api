@@ -65,10 +65,15 @@ app.post('/meal', verifyTokenAdmin, upload.single('image'), async (req, res) => 
     for (const key in body) {
         formData[key] = body[key];
     }
-
+    let categoryString = "";
+    if (Array.isArray(category)) {
+      categoryString = category.find(cat => cat !== "") || "";
+    } else {
+      categoryString = category;
+    }
     const meal = await Meal.create({
       name: formData.name,
-      category: formData.category,
+      category: categoryString,
       description: formData.description,
       servingSize: formData.servingSize,
       calories: formData.calories,
