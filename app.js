@@ -67,7 +67,7 @@ app.post('/meal', verifyTokenAdmin, upload.single('image'), async (req, res) => 
     }
     let categoryString = "";
     if (Array.isArray(category)) {
-      categoryString = category.find(cat => cat !== "") || "";
+      categoryString = formData.category.find(cat => cat !== "") || "";
     } else {
       categoryString = category;
     }
