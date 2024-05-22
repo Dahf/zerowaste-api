@@ -66,7 +66,7 @@ export const getMealCombination = async(req, res) => {
         ingredient_combinations ic ON m.id = ic."mealId";
       `,
       {
-        replacements: { replacements },
+        replacements,
         type: db.QueryTypes.SELECT,
       }
     );
