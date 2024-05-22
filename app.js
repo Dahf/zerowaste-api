@@ -80,7 +80,7 @@ app.post('/meal', verifyTokenAdmin, upload.single('image'), async (req, res) => 
       fat: formData.fat,
       carbohydrates: formData.carbohydrates,
       protein: formData.protein,
-      fiber: formData.fiber,
+      energy: formData.energy,
       sugar: formData.sugar,
       sodium: formData.sodium,
       image: publicUrl

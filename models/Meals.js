@@ -44,8 +44,8 @@ const MealModel = db.define('meals',{
     type: DataTypes.INTEGER, // Gramm Protein
     allowNull: true
   },
-  fiber: {
-    type: DataTypes.INTEGER, // Gramm Ballaststoffe
+  energy: {
+    type: DataTypes.INTEGER,
     allowNull: true
   },
   sugar: {
