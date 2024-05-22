@@ -33,6 +33,7 @@ export const getMealCombination = async(req, res) => {
   const translatedIngredients = await Promise.all(
       ingredientsArray.map(async ing => await translateText(ing, "en"))
   );
+
   const replacements = {};
   translatedIngredients.forEach((ingredient, idx) => {
     replacements[`ingredient${idx}`] = `%${ingredient}%`;
@@ -50,7 +51,7 @@ export const getMealCombination = async(req, res) => {
         JOIN
           "ingredient" i ON mi."ingredientId" = i.id
         WHERE
-          ${ingredients.map((_, idx) => `i.name ILIKE :ingredient${idx}`).join(' OR ')}
+          ${translatedIngredients.map((_, idx) => `i.name ILIKE :ingredient${idx}`).join(' OR ')}
         GROUP BY
           mi."mealId"
         HAVING
