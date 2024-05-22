@@ -50,27 +50,11 @@ export const getMealCombination = async(req, res) => {
           COUNT(*) >= 2
       )
       SELECT
-        m.*,
-        ic.ingredients,
-        JSON_AGG(
-          JSON_BUILD_OBJECT(
-            'id', i.id,
-            'name', i.name,
-            'measure', i.measure,
-            'quantity', i.quantity
-          )
-        ) AS ingredients
+        m.*
       FROM
         "meals" m
       JOIN
-        ingredient_combinations ic ON m.id = ic."mealId"
-      JOIN
-        "meal_ingredient" mi ON m.id = mi."mealId"
-      JOIN
-        "ingredient" i ON mi."ingredientId" = i.id
-      GROUP BY
-        m.id,
-        ic.ingredients;
+        ingredient_combinations ic ON m.id = ic."mealId";
       `,
       {
         replacements: { ingredients: ingredientsArray },
