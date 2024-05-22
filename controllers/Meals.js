@@ -38,6 +38,7 @@ export const getMealCombination = async(req, res) => {
   translatedIngredients.forEach((ingredient, idx) => {
     replacements[`ingredient${idx}`] = `%${ingredient}%`;
   });
+  console.log(replacements);
 
   try {
     const result = await db.query(
