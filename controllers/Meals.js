@@ -50,7 +50,16 @@ export const getMealCombination = async(req, res) => {
           COUNT(*) >= 2
       )
       SELECT
-        m.*
+        m.*,
+        ic.ingredients,
+        JSON_AGG(
+          JSON_BUILD_OBJECT(
+            'id', i.id,
+            'name', i.name,
+            'measure', i.measure,
+            'quantity', i.quantity
+          )
+        ) AS ingredients
       FROM
         "meals" m
       JOIN
