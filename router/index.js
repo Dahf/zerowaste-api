@@ -1,6 +1,6 @@
 import express from "express";
 import { verifyToken, verifyTokenAdmin } from "../middleware/VerifyToken.js";
-import { getAllUniqueCategories, getMeal, getTopGenericName } from "../controllers/Meals.js";
+import { getAllUniqueCategories, getMeal, getMealCombination, getTopGenericName } from "../controllers/Meals.js";
 import { Login, Logout, Register } from "../controllers/Users.js";
 import { refreshToken } from "../controllers/RefreshToken.js";
 
@@ -37,6 +37,7 @@ router.get('/token', refreshToken);
 router.get('/categories', getAllUniqueCategories);
 router.delete('/logout', Logout);
 router.get('/meals', getMeal);
+router.get('/combination', getMealCombination);
 
 router.get('/top-generic-name', async (req, res) => {
 

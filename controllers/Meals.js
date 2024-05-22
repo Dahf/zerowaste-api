@@ -21,7 +21,53 @@ async function translateText(text, targetLang, sourceLang = 'auto') {
     const data = await response.json();
     return data.translatedText;
 }
+export const getMealCombination = async(req, res) => {
+  const { ingredients } = req.query;
+  if (!ingredients) return res.status(400).json({ error: 'Ingredients must be provided' });
 
+  const ingredientsArray = ingredients.split(',').map(ing => ing.trim());
+  
+  if (ingredientsArray.length === 0) {
+    return res.status(400).json({ error: 'Ingredients must be a non-empty array' });
+  }
+
+  try {
+    const result = await db.query(
+      `
+      WITH ingredient_combinations AS (
+        SELECT
+          mi."mealId",
+          ARRAY_AGG(i.name ORDER BY i.name) AS ingredients
+        FROM
+          "MealIngredients" mi
+        JOIN
+          "Ingredients" i ON mi."ingredientId" = i.id
+        WHERE
+          i.name = ANY(:ingredients)
+        GROUP BY
+          mi."mealId"
+        HAVING
+          COUNT(*) >= 2
+      )
+      SELECT
+        m.*
+      FROM
+        "Meals" m
+      JOIN
+        ingredient_combinations ic ON m.id = ic."mealId";
+      `,
+      {
+        replacements: { ingredients: ingredientsArray },
+        type: db.QueryTypes.SELECT,
+      }
+    );
+
+    res.json(result);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+}
 export const getMeal = async (req, res) => {
     const { ingredients, lan, id } = req.query;
     console.log(req.query)
