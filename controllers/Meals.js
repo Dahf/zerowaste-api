@@ -62,8 +62,15 @@ export const getMealCombination = async(req, res) => {
         ) AS ingredients
       FROM
         "meals" m
+        JOIN
+        ingredient_combinations ic ON m.id = ic."mealId"
       JOIN
-        ingredient_combinations ic ON m.id = ic."mealId";
+        "meal_ingredient" mi ON m.id = mi."mealId"
+      JOIN
+        "ingredient" i ON mi."ingredientId" = i.id
+      GROUP BY
+        m.id,
+        ic.ingredients;
       `,
       {
         replacements: { ingredients: ingredientsArray },
