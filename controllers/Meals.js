@@ -62,7 +62,7 @@ export const getMealCombination = async(req, res) => {
         ) AS ingredients
       FROM
         "meals" m
-        JOIN
+      JOIN
         ingredient_combinations ic ON m.id = ic."mealId"
       JOIN
         "meal_ingredient" mi ON m.id = mi."mealId"
