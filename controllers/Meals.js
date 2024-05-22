@@ -39,7 +39,7 @@ export const getMealCombination = async(req, res) => {
           mi."mealId",
           ARRAY_AGG(i.name ORDER BY i.name) AS ingredients
         FROM
-          "MealIngredients" mi
+          "MealIngredient" mi
         JOIN
           "Ingredients" i ON mi."ingredientId" = i.id
         WHERE
