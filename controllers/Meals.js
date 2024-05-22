@@ -30,6 +30,13 @@ export const getMealCombination = async(req, res) => {
   if (ingredientsArray.length === 0) {
     return res.status(400).json({ error: 'Ingredients must be a non-empty array' });
   }
+  const translatedIngredients = await Promise.all(
+      ingredientsArray.map(async ing => await translateText(ing, "en"))
+  );
+  const replacements = {};
+  translatedIngredients.forEach((ingredient, idx) => {
+    replacements[`ingredient${idx}`] = `%${ingredient}%`;
+  });
 
   try {
     const result = await db.query(
@@ -43,7 +50,7 @@ export const getMealCombination = async(req, res) => {
         JOIN
           "ingredient" i ON mi."ingredientId" = i.id
         WHERE
-          i.name = ANY(ARRAY[:ingredients]::text[])
+          ${ingredients.map((_, idx) => `i.name ILIKE :ingredient${idx}`).join(' OR ')}
         GROUP BY
           mi."mealId"
         HAVING
@@ -57,7 +64,7 @@ export const getMealCombination = async(req, res) => {
         ingredient_combinations ic ON m.id = ic."mealId";
       `,
       {
-        replacements: { ingredients: ingredientsArray },
+        replacements: { replacements },
         type: db.QueryTypes.SELECT,
       }
     );
