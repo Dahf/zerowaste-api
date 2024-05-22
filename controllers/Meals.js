@@ -52,7 +52,7 @@ export const getMealCombination = async(req, res) => {
       SELECT
         m.*
       FROM
-        "Meals" m
+        "meals" m
       JOIN
         ingredient_combinations ic ON m.id = ic."mealId";
       `,
