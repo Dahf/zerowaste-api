@@ -26,7 +26,7 @@ export const getMealCombination = async(req, res) => {
   if (!ingredients) return res.status(400).json({ error: 'Ingredients must be provided' });
 
   const ingredientsArray = ingredients.split(',').map(ing => ing.trim());
-  
+
   if (ingredientsArray.length === 0) {
     return res.status(400).json({ error: 'Ingredients must be a non-empty array' });
   }
@@ -43,7 +43,7 @@ export const getMealCombination = async(req, res) => {
         JOIN
           "Ingredients" i ON mi."ingredientId" = i.id
         WHERE
-          i.name = ANY(:ingredients)
+          i.name = ANY(ARRAY[:ingredients]::text[])
         GROUP BY
           mi."mealId"
         HAVING
