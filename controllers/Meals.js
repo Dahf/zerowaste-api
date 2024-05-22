@@ -41,7 +41,7 @@ export const getMealCombination = async(req, res) => {
         FROM
           "MealIngredient" mi
         JOIN
-          "Ingredients" i ON mi."ingredientId" = i.id
+          "ingredient" i ON mi."ingredientId" = i.id
         WHERE
           i.name = ANY(ARRAY[:ingredients]::text[])
         GROUP BY
