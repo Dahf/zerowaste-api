@@ -156,60 +156,61 @@ export const getMeal = async (req, res) => {
     }
   };
 
-export const getTopGenericName = async(specificIngredients) => {
+  export const getTopGenericNames = async (specificIngredients) => {
     const ingredientCounts = {};
-    
+  
     for (const ingredientName of specificIngredients) {
-      try {
-        // Finden aller Zutaten mit dem spezifischen Namen
-        const ingredients = await Ingredient.findAll({
+      const singularName = pluralize.singular(ingredientName);
+      const pluralName = pluralize.plural(ingredientName);
+  
+      const searchTerms = [singularName, pluralName];
+  
+      for (const term of searchTerms) {
+        try {
+          // Finden aller Zutaten mit dem spezifischen Namen (singular und plural)
+          const ingredients = await Ingredient.findAll({
             where: {
               name: {
-                [Op.iLike]: `%${ingredientName}%`
+                [Op.iLike]: `%${term}%`
               }
             }
           });
-        
-        if (!ingredients.length) {
-          console.log(`Keine Zutaten gefunden für: ${ingredientName}`);
-          continue;
-        }
   
-        for (const ingredient of ingredients) {
-          // Zählen der Mahlzeiten, die diese Zutat enthalten
-          const result = await Meal.findAndCountAll({
-            include: {
-              model: Ingredient,
-              where: { id: ingredient.id }
-            }
-          });
-  
-          console.log(`Gefundene Mahlzeiten für Zutat ${ingredient.name} (ID: ${ingredient.id}): ${result.count}`);
-  
-          if (!ingredientCounts[ingredient.name]) {
-            ingredientCounts[ingredient.name] = 0;
+          if (!ingredients.length) {
+            console.log(`Keine Zutaten gefunden für: ${term}`);
+            continue;
           }
-          ingredientCounts[ingredient.name] += result.count;
+  
+          for (const ingredient of ingredients) {
+            // Zählen der Mahlzeiten, die diese Zutat enthalten
+            const result = await Meal.findAndCountAll({
+              include: {
+                model: Ingredient,
+                where: { id: ingredient.id }
+              }
+            });
+  
+            console.log(`Gefundene Mahlzeiten für Zutat ${ingredient.name} (ID: ${ingredient.id}): ${result.count}`);
+  
+            if (!ingredientCounts[ingredient.name]) {
+              ingredientCounts[ingredient.name] = 0;
+            }
+            ingredientCounts[ingredient.name] += result.count;
+          }
+        } catch (error) {
+          console.error(`Fehler beim Abrufen der Zutaten für ${term}:`, error);
         }
-      } catch (error) {
-        console.error(`Fehler beim Abrufen der Zutaten für ${ingredientName}:`, error);
       }
     }
   
-    // Finden des generischen Namens mit den meisten Mahlzeiten
-    let topGenericName = null;
-    let maxCount = 0;
-    for (const [ingredientName, count] of Object.entries(ingredientCounts)) {
-      if (count > maxCount) {
-        maxCount = count;
-        topGenericName = ingredientName;
-      }
-    }
+    // Sammeln aller generischen Namen
+    const genericNames = Object.keys(ingredientCounts);
+    
+    console.log(`Alle generischen Namen: ${genericNames.join(', ')}`);
   
-    console.log(`Top generischer Name: ${topGenericName} mit ${maxCount} Mahlzeiten`);
-  
-    return topGenericName;
-  }
+    return genericNames;
+  };
+
   export const getAllUniqueCategories = async (req, res) => {
     try {
       const categories = await Meal.findAll({
