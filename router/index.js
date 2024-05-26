@@ -1,6 +1,6 @@
 import express from "express";
 import { verifyToken, verifyTokenAdmin } from "../middleware/VerifyToken.js";
-import { getAllUniqueCategories, getMeal, getMealCombination, getRandomMeals, getTopGenericName } from "../controllers/Meals.js";
+import { getAllUniqueCategories, getMeal, getMealCombination, getRandomMeals, getTopGenericNames } from "../controllers/Meals.js";
 import { Login, Logout, Register } from "../controllers/Users.js";
 import { refreshToken } from "../controllers/RefreshToken.js";
 
@@ -49,7 +49,7 @@ router.get('/top-generic-name', async (req, res) => {
   );
 
    try {
-     const topGenericName = await getTopGenericName(translatedIngredients);
+     const topGenericName = await getTopGenericNames(translatedIngredients);
      res.json({ topGenericName });
    } catch (error) {
      res.status(500).json({ error: error.message });
