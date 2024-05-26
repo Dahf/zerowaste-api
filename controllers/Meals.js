@@ -3,6 +3,7 @@ import Ingredient from "../models/Ingredient.js";
 import { Op, Sequelize } from 'sequelize';
 import MealIngredient from "../models/MealIngredients.js";
 import db from "../config/Database.js";
+import pluralize from "pluralize";
 
 async function translateText(text, targetLang, sourceLang = 'auto') {
     const response = await fetch("https://translate.silasbeckmann.de/translate", {
