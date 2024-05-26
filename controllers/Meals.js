@@ -226,3 +226,27 @@ export const getTopGenericName = async(specificIngredients) => {
       res.status(500).json({ error: 'Internal Server Error' });
     }
   };
+export const getRandomMeals = async (req, res) => {
+  const { limit } = req.query;
+  const mealLimit = limit ? parseInt(limit) : 5; // Default auf 5 zufällige Mahlzeiten, wenn kein Limit angegeben ist
+
+  try {
+    const randomMeals = await Meal.findAll({
+      include: [
+        {
+          model: Ingredient,
+          through: { attributes: [] }  // Exkludieren der MealIngredient-Attribute
+        }
+      ],
+      order: [
+        Sequelize.fn('RANDOM')
+      ],
+      limit: mealLimit
+    });
+
+    res.json(randomMeals);
+  } catch (error) {
+    console.error('Error fetching random meals:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+};

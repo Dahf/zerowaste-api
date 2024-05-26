@@ -143,6 +143,7 @@ export const Login = async (req, res) => {
             path: "/",
             maxAge: 24 * 60 * 60 * 1000  // 1 day
         });
+        
         res.setHeader('Authorization', `Bearer ${accessToken}`);
         res.status(200).json({ accessToken });
     } catch (error) {
