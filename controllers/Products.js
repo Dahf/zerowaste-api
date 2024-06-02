@@ -21,6 +21,5 @@ export const searchProducts = async (searchQuery, limit = 10) => {
         where: Sequelize.literal(`tsv @@ plainto_tsquery('simple', :query)`),
         bind: { query: searchQuery },
         limit: limit,
-        offset: offset
     });
   };
