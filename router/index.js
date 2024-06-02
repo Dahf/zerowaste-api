@@ -3,6 +3,7 @@ import { verifyToken, verifyTokenAdmin } from "../middleware/VerifyToken.js";
 import { getAllUniqueCategories, getMeal, getMealCombination, getRandomMeals, getTopGenericNames } from "../controllers/Meals.js";
 import { Login, Logout, Register } from "../controllers/Users.js";
 import { refreshToken } from "../controllers/RefreshToken.js";
+import { getProductByBarcode } from "../controllers/Products.js";
 
 const router = express.Router();
 
@@ -39,6 +40,7 @@ router.delete('/logout', Logout);
 router.get('/meals', getMeal);
 router.get('/random-meals', getRandomMeals);
 router.get('/combination', getMealCombination);
+router.get('/products', getProductByBarcode);
 
 router.get('/top-generic-name', async (req, res) => {
 

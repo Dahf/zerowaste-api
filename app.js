@@ -2,6 +2,7 @@ import express from "express";
 import dotenv from "dotenv";
 import Meal from './models/Meals.js'
 import Ingredient from "./models/Ingredient.js";
+import Ingredient from "./models/Products.js";
 import router from "./router/index.js";
 import MealIngredient from "./models/MealIngredients.js";
 import cookieParser from "cookie-parser";
