@@ -57,7 +57,7 @@ router.get('/products/search', async (req, res) => {
        res.status(404).json({ message: 'No products found' });
      }
    } catch (error) {
-     res.status(500).json({ error: 'Failed to search products' });
+     res.status(500).json({ error });
    }
  });
 
