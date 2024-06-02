@@ -18,8 +18,7 @@ export const getProductByBarcode = async (req, res) => {
 }
 export const searchProducts = async (searchQuery, limit = 10) => {
     return await Product.findAll({
-        where: Sequelize.literal(`tsv @@ plainto_tsquery('simple', :query)`),
-        bind: { query: searchQuery },
-        limit: limit,
+        where: Sequelize.literal(`tsv @@ plainto_tsquery('simple', '${searchQuery}')`),
+        limit: limit
     });
   };
