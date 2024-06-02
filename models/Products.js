@@ -231,7 +231,8 @@ const Product = db.define('products', {
   correctors_tags: { type: DataTypes.JSON, allowNull: true },
   allergens_from_user: { type: DataTypes.STRING, allowNull: true }
 }, {
-  freezeTableName: false
+  freezeTableName: true,
+  timestamps: false
 });
 
 (async () => {
