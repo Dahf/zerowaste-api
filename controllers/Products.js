@@ -16,7 +16,7 @@ export const getProductByBarcode = async (req, res) => {
         res.status(500).json({ error: 'Internal Server Error' });
     }
 }
-export const searchProducts = async (searchQuery, limit = 1000) => {
+export const searchProducts = async (searchQuery, limit = 10) => {
     return await Product.findAll({
       where: {
         product_name: {
