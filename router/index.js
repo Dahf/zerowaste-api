@@ -3,7 +3,8 @@ import { verifyToken, verifyTokenAdmin } from "../middleware/VerifyToken.js";
 import { getAllUniqueCategories, getMeal, getMealCombination, getRandomMeals, getTopGenericNames } from "../controllers/Meals.js";
 import { Login, Logout, Register } from "../controllers/Users.js";
 import { refreshToken } from "../controllers/RefreshToken.js";
-import { getProductByBarcode } from "../controllers/Products.js";
+import { getProductByBarcode, searchProducts } from "../controllers/Products.js";
+import Product from "../models/Products.js";
 
 const router = express.Router();
 
@@ -41,6 +42,24 @@ router.get('/meals', getMeal);
 router.get('/random-meals', getRandomMeals);
 router.get('/combination', getMealCombination);
 router.get('/products', getProductByBarcode);
+
+router.get('/products/search', async (req, res) => {
+   try {
+     const { query } = req.query;
+     if (!query) {
+       return res.status(400).json({ message: 'Query parameter is required' });
+     }
+ 
+     const products = await searchProducts(query);
+     if (products.length > 0) {
+       res.status(200).json(products);
+     } else {
+       res.status(404).json({ message: 'No products found' });
+     }
+   } catch (error) {
+     res.status(500).json({ error: 'Failed to search products' });
+   }
+ });
 
 router.get('/top-generic-name', async (req, res) => {
 

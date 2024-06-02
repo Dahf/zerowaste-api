@@ -15,3 +15,23 @@ export const getProductByBarcode = async (req, res) => {
         res.status(500).json({ error: 'Internal Server Error' });
     }
 }
+export const searchProducts = async (searchQuery) => {
+    const terms = searchQuery.split(' ').map(term => term.trim());
+  
+    return await Product.findAll({
+      where: {
+        [Op.or]: [
+          {
+            product_name: {
+              [Op.iLike]: `%${searchQuery}%`
+            }
+          },
+          ...terms.map(term => ({
+            categories: {
+              [Op.iLike]: `%${term}%`
+            }
+          }))
+        ]
+      }
+    });
+  };
