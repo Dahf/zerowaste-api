@@ -17,12 +17,17 @@ export const getProductByBarcode = async (req, res) => {
     }
 }
 export const searchProducts = async (searchQuery, limit = 10) => {
-    return await Product.findAll({
-      where: {
-        product_name: {
-            [Op.iLike]: `%${searchQuery}%`
-        }
-      },
-      limit: limit
-    });
+    try{
+        const product = await Product.findAll({
+            where: Sequelize.literal(`tsv @@ plainto_tsquery('simple', :query)`),
+            bind: { query: searchQuery },
+            limit: limit,
+            offset: offset
+        });
+        res.json(product);
+    } catch (error) {
+        // Handle the error appropriately
+        console.error('Error fetching product by name:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
   };

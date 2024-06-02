@@ -229,7 +229,8 @@ const Product = db.define('products', {
   countries_debug_tags: { type: DataTypes.JSON, allowNull: true },
   packaging: { type: DataTypes.JSON, allowNull: true },
   correctors_tags: { type: DataTypes.JSON, allowNull: true },
-  allergens_from_user: { type: DataTypes.STRING, allowNull: true }
+  allergens_from_user: { type: DataTypes.STRING, allowNull: true },
+  tsv: { type: DataTypes.TSVECTOR, allowNull: true } 
 }, {
   freezeTableName: true,
   timestamps: false
