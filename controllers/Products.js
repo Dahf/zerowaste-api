@@ -1,4 +1,5 @@
 import Product from "../models/Products.js";
+import { Op, Sequelize } from 'sequelize';
 
 export const getProductByBarcode = async (req, res) => {
     const { barcode } = req.query;
