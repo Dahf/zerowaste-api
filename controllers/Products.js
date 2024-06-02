@@ -1,4 +1,4 @@
-import Product from "../models/Products";
+import Product from "../models/Products.js";
 
 export const getProductByBarcode = async (req, res) => {
     const { barcode } = req.query;
