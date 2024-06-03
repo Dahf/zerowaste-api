@@ -61,7 +61,8 @@ export const searchProducts = async (searchQuery, limit = 10) => {
     try {
         const products = await Product.findAll({
             where: Sequelize.literal(`tsv @@ plainto_tsquery('simple', '${searchQuery}')`),
-            limit: limit
+            limit: limit,
+            order: [['completeness', 'DESC']]
         });
 
         const productsWithImages = products.map(product => {
