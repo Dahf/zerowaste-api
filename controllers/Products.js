@@ -2,8 +2,14 @@ import Product from "../models/Products.js";
 import { Op, Sequelize } from 'sequelize';
 import re from 're';
 
-function getImageUrl(productData, imageName, resolution = 'full') {
-    if (!productData.images || !productData.images[imageName]) {
+function getImageUrl(productData, baseName, resolution = 'full') {
+    if (!productData.images) {
+        return null;
+    }
+
+    // Find the first key that starts with the base name
+    const imageName = Object.keys(productData.images).find(name => name.startsWith(baseName));
+    if (!imageName) {
         return null;
     }
 
@@ -25,6 +31,7 @@ function getImageUrl(productData, imageName, resolution = 'full') {
 
     return `${baseUrl}/${folderName}/${filename}`;
 }
+
 
 export const getProductByBarcode = async (req, res) => {
     const { barcode } = req.query;
