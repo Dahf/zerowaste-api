@@ -41,17 +41,3 @@ if __name__ == "__main__":
     predictions = load_and_predict(image)
     print(predictions)
     
-    # Extract bounding boxes and confidence scores
-    boxes = []
-    for pred in predictions:
-        for box in pred.boxes:
-            boxes.append({
-                'x1': box.xyxy[0].item(),
-                'y1': box.xyxy[1].item(),
-                'x2': box.xyxy[2].item(),
-                'y2': box.xyxy[3].item(),
-                'confidence': box.conf.item()
-            })
-
-    items = extract_text_from_image(image, boxes)
-    print(json.dumps(items))
