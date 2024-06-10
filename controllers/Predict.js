@@ -3,30 +3,39 @@ import { PythonShell } from 'python-shell';
 export const getPrediction = async (req, res) => {
     const imgBuffer = req.body;
 
-    // Save the image buffer to a temporary file
-    const tempImagePath = 'temp_image.jpg';
-    require('fs').writeFileSync(tempImagePath, imgBuffer);
-
-    // Options for PythonShell
+    // Optionen für PythonShell
     let options = {
-        args: [tempImagePath]
+        mode: 'binary',
+        pythonOptions: ['-u'], // Unbuffered stdout
+        scriptPath: '', // Optional, falls das Skript in einem anderen Verzeichnis liegt
+        args: [] // Keine Argumente erforderlich
     };
 
-    PythonShell.run('predict.py', options, (err, results) => {
-        if (err) {
-            console.error(err);
-            return res.status(500).send('An error occurred while running the Python script');
+    let pyshell = new PythonShell('predict.py', options);
+
+    let scriptOutput = '';
+
+    pyshell.stdout.on('data', (data) => {
+        scriptOutput += data.toString();
+    });
+
+    pyshell.stderr.on('data', (data) => {
+        console.error(`stderr: ${data}`);
+    });
+
+    pyshell.on('close', (code) => {
+        if (code !== 0) {
+            return res.status(500).send(`Python script exited with code ${code}`);
         }
-        console.log(results[0]);
-        // Results is an array of strings. Parse the JSON string to an object.
+
         try {
-            const predictions = JSON.parse(results[0]);
-            res.json(predictions);
+            const result = JSON.parse(scriptOutput);
+            res.json(result);
         } catch (error) {
             res.status(500).send('Failed to parse predictions');
         }
-
-        // Clean up the temporary file
-        require('fs').unlinkSync(tempImagePath);
     });
+
+    // Senden Sie den Bildpuffer an das Python-Skript
+    pyshell.send(imgBuffer).end();
 };
