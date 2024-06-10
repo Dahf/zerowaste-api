@@ -6,11 +6,12 @@ import pytesseract
 from io import BytesIO
 from ultralytics import YOLO
 
-def load_and_predict(image):
+def load_and_predict(image_path):
     # Load the YOLOv5 model
     model = YOLO('best-2.pt')
 
-    # Convert image to numpy array
+    # Load the image
+    image = Image.open(image_path)
     img_array = np.array(image)
 
     # Make predictions
@@ -32,15 +33,9 @@ def extract_text_from_image(image, boxes, threshold=0.7):
 
 if __name__ == "__main__":
     try:
-        # Read image data from stdin
-        image_data = sys.stdin.buffer.read()
-
-        # Load image from bytes
-        image = Image.open(BytesIO(image_data))
-
-        # Predict
-        predictions = load_and_predict(image)
+        image_path = sys.argv[1]
+        predictions = load_and_predict(image_path)
         print(json.dumps(predictions))
     except Exception as e:
         print(f"An error occurred: {e}", file=sys.stderr)
-    sys.stdout.flush()
+        sys.exit(1)

@@ -13,7 +13,7 @@ import { fileURLToPath } from 'url';
 import fs from 'fs';
 import { verifyTokenAdmin } from "./middleware/VerifyToken.js";
 import bodyParser from "body-parser";
-import { spawn } from "child_process";
+import { PythonShell } from "python-shell";
 
 
 dotenv.config();
@@ -144,21 +144,19 @@ Ingredient.belongsToMany(Meal, { through: MealIngredient });
 
 const PORT = process.env.PORT || 8088;
 
-// Function to install Python packages
 function installPythonPackages(callback) {
-  const pythonProcess = spawn('python', ['install_dependencies.py']);
+  let options = {
+      scriptPath: '', // Optional, falls das Skript in einem anderen Verzeichnis liegt
+      args: [] // Keine Argumente erforderlich
+  };
 
-  pythonProcess.stdout.on('data', (data) => {
-      console.log(`stdout: ${data}`);
-  });
-
-  pythonProcess.stderr.on('data', (data) => {
-      console.error(`stderr: ${data}`);
-  });
-
-  pythonProcess.on('close', (code) => {
-      if (code !== 0) {
-          console.error(`Python script exited with code ${code}`);
+  PythonShell.run('install_dependencies.py', options, (err, results) => {
+      if (err) {
+          console.error(`stderr: ${err}`);
+      } else {
+          results.forEach(result => {
+              console.log(`stdout: ${result}`);
+          });
       }
       callback();
   });
