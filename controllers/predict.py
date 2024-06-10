@@ -36,6 +36,7 @@ if __name__ == "__main__":
         image_path = sys.argv[1]
         predictions = load_and_predict(image_path)
         print(json.dumps(predictions))
+        print("Test")
     except Exception as e:
         print(f"An error occurred: {e}", file=sys.stderr)
         sys.exit(1)
