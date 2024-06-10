@@ -31,14 +31,16 @@ def extract_text_from_image(image, boxes, threshold=0.7):
     return items
 
 if __name__ == "__main__":
-    # Read image data from stdin
-    image_data = sys.stdin.buffer.read()
+    try:
+        # Read image data from stdin
+        image_data = sys.stdin.buffer.read()
 
-    # Load image from bytes
-    image = Image.open(BytesIO(image_data))
+        # Load image from bytes
+        image = Image.open(BytesIO(image_data))
 
-    # Predict
-    predictions = load_and_predict(image)
-    print(predictions)
+        # Predict
+        predictions = load_and_predict(image)
+        print(json.dumps(predictions))
+    except Exception as e:
+        print(f"An error occurred: {e}", file=sys.stderr)
     sys.stdout.flush()
-    

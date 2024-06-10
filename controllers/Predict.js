@@ -1,5 +1,6 @@
 import { spawn } from "child_process";
 
+
 export const getPrediction = async (req, res) => {
     const imgBuffer = req.body;
   

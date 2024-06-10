@@ -142,8 +142,28 @@ Ingredient.belongsToMany(Meal, { through: MealIngredient });
 
 const PORT = process.env.PORT || 8088;
 
+// Function to install Python packages
+function installPythonPackages(callback) {
+  const pythonProcess = spawn('python', ['install_dependencies.py']);
 
-app.listen(PORT, () => {
-    console.log("Server Listening on PORT:", PORT);
+  pythonProcess.stdout.on('data', (data) => {
+      console.log(`stdout: ${data}`);
+  });
+
+  pythonProcess.stderr.on('data', (data) => {
+      console.error(`stderr: ${data}`);
+  });
+
+  pythonProcess.on('close', (code) => {
+      if (code !== 0) {
+          console.error(`Python script exited with code ${code}`);
+      }
+      callback();
+  });
+}
+installPythonPackages(() => {
+  app.listen(PORT, () => {
+      console.log("Server Listening on PORT:", PORT);
+  });
 });
 
