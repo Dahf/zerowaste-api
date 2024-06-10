@@ -9,6 +9,7 @@ export const getPrediction = async (req, res) => {
   
     pythonProcess.stdout.on('data', (data) => {
       scriptOutput += data.toString();
+      console.log(data);
     });
 
     
