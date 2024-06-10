@@ -8,7 +8,7 @@ WORKDIR /usr/src/app
 # A wildcard is used to ensure both package.json AND package-lock.json are copied
 COPY package*.json ./
 
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir numpy pillow pytesseract ultralytics
 
 RUN npm install
 RUN npm install pm2 -g
