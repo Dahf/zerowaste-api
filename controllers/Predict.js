@@ -17,7 +17,7 @@ export const getPrediction = async (req, res) => {
             console.error(err);
             return res.status(500).send('An error occurred while running the Python script');
         }
-
+        console.log(results[0]);
         // Results is an array of strings. Parse the JSON string to an object.
         try {
             const predictions = JSON.parse(results[0]);
