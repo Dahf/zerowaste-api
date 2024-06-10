@@ -30,7 +30,11 @@ export const getPrediction = async (req, res) => {
 
         try {
             const result = JSON.parse(scriptOutput);
-            res.json(result);
+            if(result)
+              res.json(result);
+            else {
+              res.json("no result");
+            }
         } catch (error) {
             res.status(500).send('Failed to parse predictions');
         }
