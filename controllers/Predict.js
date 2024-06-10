@@ -2,7 +2,7 @@ import { PythonShell } from 'python-shell';
 
 export const getPrediction = async (req, res) => {
     const imgBuffer = req.body;
-
+    console.log(req.body)
     // Optionen für PythonShell
     let options = {
         mode: 'binary',
