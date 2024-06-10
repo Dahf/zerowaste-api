@@ -12,6 +12,7 @@ import path from "path";
 import { fileURLToPath } from 'url';
 import fs from 'fs';
 import { verifyTokenAdmin } from "./middleware/VerifyToken.js";
+import bodyParser from "body-parser";
 
 dotenv.config();
 const app = express();
@@ -23,6 +24,7 @@ const corsOptions = {
 };
 
 app.use(cors(corsOptions));
+app.use(bodyParser.raw({ type: 'application/octet-stream', limit: '10mb' }));
 app.use(cookieParser());
 app.use(express.json());
 

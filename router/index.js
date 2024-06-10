@@ -5,6 +5,7 @@ import { Login, Logout, Register } from "../controllers/Users.js";
 import { refreshToken } from "../controllers/RefreshToken.js";
 import { getProductByBarcode, searchProducts } from "../controllers/Products.js";
 import Product from "../models/Products.js";
+import { getPrediction } from "../controllers/Predict.js";
 
 const router = express.Router();
 
@@ -42,6 +43,7 @@ router.get('/meals', getMeal);
 router.get('/random-meals', getRandomMeals);
 router.get('/combination', getMealCombination);
 router.get('/products', getProductByBarcode);
+router.post('/predict', getPrediction);
 
 router.get('/products/search', async (req, res) => {
    try {
