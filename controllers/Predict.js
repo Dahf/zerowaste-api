@@ -11,7 +11,7 @@ export const getPrediction = async (req, res) => {
       scriptOutput += data.toString();
     });
 
-    console.log(JSON.parse(scriptOutput));
+    console.log(scriptOutput);
   
     pythonProcess.stderr.on('data', (data) => {
       console.error(`stderr: ${data}`);
