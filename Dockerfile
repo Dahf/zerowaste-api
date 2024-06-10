@@ -1,4 +1,5 @@
 FROM node:18
+FROM python:3.10-slim
 
 # Create app directory
 WORKDIR /usr/src/app
@@ -6,6 +7,8 @@ WORKDIR /usr/src/app
 # Install app dependencies
 # A wildcard is used to ensure both package.json AND package-lock.json are copied
 COPY package*.json ./
+
+RUN pip install --no-cache-dir -r requirements.txt
 
 RUN npm install
 RUN npm install pm2 -g
