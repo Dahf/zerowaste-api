@@ -11,8 +11,7 @@ export const getPrediction = async (req, res) => {
       scriptOutput += data.toString();
     });
 
-    console.log(scriptOutput);
-  
+    
     pythonProcess.stderr.on('data', (data) => {
       console.error(`stderr: ${data}`);
     });
@@ -21,6 +20,7 @@ export const getPrediction = async (req, res) => {
       if (code !== 0) {
         return res.status(500).send(`Python script exited with code ${code}`);
       }
+      console.log(scriptOutput);
   
       // Parse the JSON output from the Python script
       const result = JSON.parse(scriptOutput);
