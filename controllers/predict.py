@@ -40,4 +40,5 @@ if __name__ == "__main__":
     # Predict
     predictions = load_and_predict(image)
     print(predictions)
+    sys.stdout.flush()
     
