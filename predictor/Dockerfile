@@ -10,7 +10,6 @@ COPY requirements.txt .
 # Installieren Sie die Python-Abhängigkeiten
 RUN pip3 install --no-cache-dir flask torchvision torch
 
-d
 # Kopieren Sie den Rest der Anwendung
 COPY . .
 
