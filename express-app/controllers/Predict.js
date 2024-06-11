@@ -3,15 +3,20 @@ import { PythonShell } from 'python-shell';
 export const getPrediction = async (req, res) => {
     const imgBuffer = req.body;
     try {
-        // Senden Sie den Bildpuffer an den Python-Container
-        const response = await axios.post('http://python-predictor:5000/predict', imgBuffer, {
+        const response = await fetch('http://python-predictor:5000/predict', {
+            method: 'POST',
             headers: {
                 'Content-Type': 'application/octet-stream'
-            }
+            },
+            body: imgBuffer
         });
 
-        // Rückgabe der Vorhersagen
-        res.json(response.data);
+        if (!response.ok) {
+            throw new Error('Failed to get prediction from Python container');
+        }
+
+        const data = await response.json();
+        res.json(data);
     } catch (error) {
         console.error(error);
         res.status(500).send('Failed to get prediction from Python container');

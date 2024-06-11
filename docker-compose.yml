@@ -1,6 +1,7 @@
 version: '3.8'
 services:
   python-predictor:
+    container_name: python-predictor
     build:
       context: ./predictor
       dockerfile: Dockerfile
