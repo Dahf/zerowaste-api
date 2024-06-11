@@ -1,74 +1,67 @@
-import io
-import json
-import os
-
+from flask import Flask, request, jsonify
+from PIL import Image
 import torch
 import torchvision.transforms as transforms
-from PIL import Image
-from flask import Flask, jsonify, request
-from torchvision.models import resnet18
-
+from io import BytesIO
 
 app = Flask(__name__)
 
-model = resnet18(pretrained=True)
+# Laden Sie das Modell
+model = torch.jit.load('best-2.pt')
 model.eval()
+
+def process_image(image):
+    # Preprocess image for model
+    transformation = transforms.Compose([
+        transforms.Resize(256),
+        transforms.CenterCrop(224),
+        transforms.ToTensor(),
+        transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
+    ])
+    image_tensor = transformation(image).unsqueeze(0)
+    
+    return image_tensor
 
 class_names = ["Address", "Date", "Item", "OrderId", "Subtotal", "Tax", "Title", "TotalPrice"]
 
-
-
-# Transform input into the form our model expects
-def transform_image(image_bytes):
-    input_transforms = [
-        transforms.Resize(255),  # We use multiple TorchVision transforms to ready the image
-        transforms.CenterCrop(224),
-        transforms.ToTensor(),
-        transforms.Normalize([0.485, 0.456, 0.406],  # Standard normalization for ImageNet model input
-                             [0.229, 0.224, 0.225])
-    ]
-    my_transforms = transforms.Compose(input_transforms)
-    image = Image.open(io.BytesIO(image_bytes)).convert('RGB')  # Open the image from bytes and ensure it's in RGB mode
-    timg = my_transforms(image)  # Transform PIL image to appropriately-shaped PyTorch tensor
-    timg.unsqueeze_(0)  # PyTorch models expect batched input; create a batch of 1
-    return timg
-
-
-# Get a prediction
-def get_prediction(input_tensor):
-    outputs = model(input_tensor)  # Get likelihoods for all classes
-    _, y_hat = outputs.max(1)  # Extract the most likely class
-    prediction = y_hat.item()  # Extract the int value from the PyTorch tensor
-    return prediction
-
-
-# Make the prediction human-readable
-def render_prediction(prediction_idx):
-    class_name = class_names[prediction_idx]
-
-    return prediction_idx, class_name
-
-
-@app.route('/', methods=['GET'])
-def root():
-    return jsonify({'msg': 'Try POSTing to the /predict endpoint with an RGB image byte array'})
-
+@app.route('/')
+def home():
+    return "Welcome to the Image Prediction API"
 
 @app.route('/predict', methods=['POST'])
 def predict():
-    if request.method == 'POST':
-        try:
-            image_bytes = request.data
-            if image_bytes:
-                input_tensor = transform_image(image_bytes)
-                prediction_idx = get_prediction(input_tensor)
-                class_id, class_name = render_prediction(prediction_idx)
-                return jsonify({'class_id': class_id, 'class_name': class_name})
-            else:
-                return jsonify({'error': 'No image data received'}), 400
-        except Exception as e:
-            return jsonify({'error': str(e)}), 500
+    try:
+        # Get image buffer from request
+        image_data = request.data
+        image = Image.open(BytesIO(image_data))
 
+        # Process image and make prediction
+        image_tensor = process_image(image)
+        output = model(image_tensor)
+
+        # Get class probabilities
+        probabilities = torch.nn.functional.softmax(output, dim=1)
+        probabilities = probabilities.detach().numpy()[0]
+
+        # Get the index of the highest probability
+        class_index = probabilities.argmax()
+
+        # Get the predicted class and probability
+        predicted_class = class_names[class_index]
+        probability = probabilities[class_index]
+
+        # Sort class probabilities in descending order
+        class_probs = list(zip(class_names, probabilities))
+        class_probs.sort(key=lambda x: x[1], reverse=True)
+
+        # Return JSON response with prediction results
+        return jsonify({
+            'class_probs': class_probs,
+            'predicted_class': predicted_class,
+            'probability': probability
+        })
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)
