@@ -10,7 +10,7 @@ services:
     networks:
       - app-network
     volumes:
-      - ./sk_invoice_receipts:/usr/src/app/sk_invoice_receipts
+      - sk_invoice_receipts:/usr/src/app/sk_invoice_receipts
   backend:
     build:
       context: ./express-app
@@ -98,3 +98,5 @@ networks:
 volumes:
     postgres:
     pgadmin:
+    sk_invoice_receipts:
+    uploads:
