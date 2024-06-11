@@ -25,8 +25,7 @@ def vorverarbeitung(image):
 
     processed_gray = cv2.adaptiveThreshold(cv2.medianBlur(gray, 3), 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 31, 2)
     config = ("--psm 6")
-
-    return pytesseract.image_to_string(processed_gray, config, lang='eng')
+    return pytesseract.image_to_string(processed_gray, config=config, lang='eng')
 
 @app.route('/')
 def home():
