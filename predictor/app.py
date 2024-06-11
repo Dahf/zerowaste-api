@@ -3,8 +3,24 @@ from PIL import Image
 from io import BytesIO
 import pytesseract
 from langdetect import detect
+import cv2
 
 app = Flask(__name__)
+
+def vorverarbeitung(image_path):
+    # Laden des Bildes
+    image = cv2.imread(image_path)
+    
+    # Konvertierung in Graustufen
+    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    
+    # Rauschunterdrückung mit GaussianBlur
+    gray = cv2.GaussianBlur(gray, (5, 5), 0)
+    
+    # Erhöhung des Kontrasts mit Adaptive Thresholding
+    gray = cv2.adaptiveThreshold(gray, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 11, 2)
+    
+    return gray
 
 @app.route('/')
 def home():
@@ -16,7 +32,7 @@ def predict():
     image_data = request.data
     image = Image.open(BytesIO(image_data))
 
-    text = pytesseract.image_to_string(image)
+    text = pytesseract.image_to_string(vorverarbeitung(image))
     
     return {"text": text}
 
