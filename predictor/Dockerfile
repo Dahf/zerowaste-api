@@ -1,6 +1,18 @@
 # Use the official PyTorch image as a base to avoid dependency issues
 FROM pytorch/pytorch:latest
 
+# Install git and git-lfs
+RUN apt-get update && \
+    apt-get install -y git git-lfs && \
+    git lfs install
+
+# Set the working directory
+WORKDIR /usr/src/app/parent
+
+RUN git lfs install
+# Pull LFS files
+RUN git lfs pull
+
 # Set the working directory in the container
 WORKDIR /usr/src/app
 

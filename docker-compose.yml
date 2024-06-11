@@ -11,6 +11,7 @@ services:
       - app-network
     volumes:
       - sk_invoice_receipts:/usr/src/app/sk_invoice_receipts
+      - ../:/usr/src/app/parent
   backend:
     build:
       context: ./express-app
