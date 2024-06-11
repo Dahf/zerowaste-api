@@ -45,20 +45,9 @@ def preprocess_image(image):
 def home():
     return "Welcome to the Image Prediction API"
 
-def find_match(regex, text):
-    matches = re.finditer(regex, text, re.MULTILINE)
-    target = ""
-    for matchNum, match in enumerate(matches):
-        matchNum = matchNum + 1
-
-        print("  Match {matchNum} was found at {start}-{end}: {match}".format(matchNum=matchNum, start=match.start(),
-                                                                            end=match.end(), match=match.group()))
-        target = match.group()
-
-    return target
-
 @app.route('/predict', methods=['POST'])
 def predict():
+    print("Predict Request")
     image_data = request.data
     image = Image.open(BytesIO(image_data)).convert('RGB')  # Ensure image is in RGB mode
     processed_image = preprocess_image(image)
