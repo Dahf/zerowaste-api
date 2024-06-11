@@ -9,6 +9,8 @@ services:
       - "5000:5000"
     networks:
       - app-network
+    volumes:
+      - ./sk_invoice_receipts:/usr/src/app/sk_invoice_receipts
   backend:
     build:
       context: ./express-app
