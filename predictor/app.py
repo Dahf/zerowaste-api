@@ -25,8 +25,8 @@ def apply_threshold(img, argument):
 
 def vorverarbeitung(image, method):
     # Konvertiere das Bild in ein NumPy-Array
-    image = image.astype("uint8")
-    
+
+
     image_np = np.array(image)
 
     gray = cv2.resize(image_np, None, fx=1.5, fy=1.5, interpolation=cv2.INTER_CUBIC)
@@ -37,9 +37,10 @@ def vorverarbeitung(image, method):
     gray = cv2.dilate(image_np, kernel, iterations=1)
     gray = cv2.erode(image_np, kernel, iterations=1)
 
-    gray = apply_threshold(image_np, method)
-    pytesseract.image_to_string(gray, lang='eng')
-    return gray
+    gray = gray.astype(np.uint8)
+    gray = apply_threshold(gray, method)
+
+    return pytesseract.image_to_string(gray, lang='eng')
 
 @app.route('/')
 def home():
