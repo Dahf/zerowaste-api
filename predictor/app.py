@@ -1,7 +1,5 @@
 from flask import Flask, request, jsonify
-from PIL import Image
-import torch
-import torchvision.transforms as transforms
+from PIL import image
 from io import BytesIO
 import pytesseract
 from langdetect import detect

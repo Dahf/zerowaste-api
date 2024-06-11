@@ -4,9 +4,17 @@ FROM pytorch/pytorch:latest
 # Set the working directory in the container
 WORKDIR /usr/src/app
 
-RUN apt-get update && apt-get install ffmpeg libsm6 libxext6  -y
+RUN apt-get update && apt-get install -y \
+    tesseract-ocr \
+    tesseract-ocr-deu \
+    tesseract-ocr-eng \
+    tesseract-ocr-fra \
+    libsm6 \
+    libxrender1 \
+    libfontconfig1 \
+    libice6
 
-RUN pip install flask ultralytics tensorflow langdetect pytesseract
+RUN pip install flask tensorflow langdetect pytesseract opencv-python-headless Pillow
 
 # Copy the rest of the application
 COPY . .
