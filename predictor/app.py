@@ -14,11 +14,8 @@ app = Flask(__name__)
 model = resnet18(pretrained=True)
 model.eval()
 
-img_class_map = None
-mapping_file_path = 'index_to_name.json'  # Human-readable names for Imagenet classes or your custom classes
-if os.path.isfile(mapping_file_path):
-    with open(mapping_file_path) as f:
-        img_class_map = json.load(f)
+class_names = ["Address", "Date", "Item", "OrderId", "Subtotal", "Tax", "Title", "TotalPrice"]
+
 
 
 # Transform input into the form our model expects
@@ -48,10 +45,7 @@ def get_prediction(input_tensor):
 # Make the prediction human-readable
 def render_prediction(prediction_idx):
     stridx = str(prediction_idx)
-    class_name = 'Unknown'
-    if img_class_map is not None:
-        if stridx in img_class_map:
-            class_name = img_class_map[stridx][1]
+    class_name = class_names[stridx]
 
     return prediction_idx, class_name
 
