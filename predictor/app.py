@@ -6,22 +6,30 @@ from langdetect import detect
 import cv2
 import numpy as np
 import re
+from scipy.ndimage import gaussian_filter
 
 app = Flask(__name__)
 
 regex = r"P\d{17}"
 
 def apply_threshold(img, argument):
-    switcher = {
-        1: cv2.threshold(cv2.GaussianBlur(img, (9, 9), 0), 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)[1],
-        2: cv2.threshold(cv2.GaussianBlur(img, (7, 7), 0), 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)[1],
-        3: cv2.threshold(cv2.GaussianBlur(img, (5, 5), 0), 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)[1],
-        4: cv2.threshold(cv2.medianBlur(img, 5), 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)[1],
-        5: cv2.threshold(cv2.medianBlur(img, 3), 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)[1],
-        6: cv2.adaptiveThreshold(cv2.GaussianBlur(img, (5, 5), 0), 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 31, 2),
-        7: cv2.adaptiveThreshold(cv2.medianBlur(img, 3), 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 31, 2),
-    }
-    return switcher.get(argument, "Invalid method")
+    if argument in [1, 2, 3]:
+        sigma = {1: 9, 2: 7, 3: 5}[argument]
+        img = gaussian_filter(img, sigma=sigma)
+        _, img = cv2.threshold(img, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+    elif argument in [4, 5]:
+        ksize = {4: 5, 5: 3}[argument]
+        img = cv2.medianBlur(img, ksize)
+        _, img = cv2.threshold(img, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+    elif argument == 6:
+        img = gaussian_filter(img, sigma=5)
+        img = cv2.adaptiveThreshold(img, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 31, 2)
+    elif argument == 7:
+        img = cv2.medianBlur(img, 3)
+        img = cv2.adaptiveThreshold(img, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 31, 2)
+    else:
+        return "Invalid method"
+    return img
 
 def vorverarbeitung(image, method):
     # Konvertiere das Bild in ein NumPy-Array
