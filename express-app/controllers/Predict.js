@@ -1,8 +1,7 @@
 import { PythonShell } from 'python-shell';
 
 export const getPrediction = async (req, res) => {
-    const imgBuffer = req.file.buffer;
-
+    const imgBuffer = req.body;
     try {
         // Senden Sie den Bildpuffer an den Python-Container
         const response = await axios.post('http://python-predictor:5000/predict', imgBuffer, {
