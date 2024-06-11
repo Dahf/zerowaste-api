@@ -4,6 +4,8 @@ FROM pytorch/pytorch:latest
 # Set the working directory in the container
 WORKDIR /usr/src/app
 
+RUN apt-get update && apt-get install ffmpeg libsm6 libxext6  -y
+
 RUN pip install flask ultralytics
 
 # Copy the rest of the application
