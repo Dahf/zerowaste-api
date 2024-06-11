@@ -3,14 +3,10 @@ from PIL import Image
 import torch
 import torchvision.transforms as transforms
 from io import BytesIO
-from ultralytics import YOLO
+import pytesseract
+from langdetect import detect
 
 app = Flask(__name__)
-
-# Laden Sie das Modell
-model = YOLO('best-2.tflite')
-
-class_names = ["Address", "Date", "Item", "OrderId", "Subtotal", "Tax", "Title", "TotalPrice"]
 
 @app.route('/')
 def home():
@@ -22,9 +18,9 @@ def predict():
     image_data = request.data
     image = Image.open(BytesIO(image_data))
 
-    results = model(image, imgsz=800, save=False)
-    results_json = {"boxes":results[0].boxes.xyxy.tolist(),"classes":results[0].boxes.cls.tolist()}
-    return {"result": results_json}
+    text = pytesseract.image_to_string(image)
+    
+    return {"text": text}
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
