@@ -1,5 +1,13 @@
 version: '3.8'
 services:
+  python-predictor:
+    build:
+      context: ./predictor
+      dockerfile: Dockerfile
+    ports:
+      - "5000:5000"
+    networks:
+      - app-network
   backend:
     build:
       context: ./express-app
