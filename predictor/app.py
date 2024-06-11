@@ -32,19 +32,15 @@ def apply_threshold(img, argument):
     return img
 
 def vorverarbeitung(image, method):
-    # Konvertiere das Bild in ein NumPy-Array
-
-
     image_np = np.array(image)
-    
-    gray = cv2.cvtColor(image_np, cv2.COLOR_BGR2GRAY)
 
-    gray = cv2.resize(image_np, None, fx=1.5, fy=1.5, interpolation=cv2.INTER_CUBIC)
-    # Konvertierung in Graustufen
-    
+    # Ensure image is converted to grayscale
+    gray = cv2.cvtColor(image_np, cv2.COLOR_BGR2GRAY)
+    gray = cv2.resize(gray, None, fx=1.5, fy=1.5, interpolation=cv2.INTER_CUBIC)
+
     kernel = np.ones((1, 1), np.uint8)
-    gray = cv2.dilate(image_np, kernel, iterations=1)
-    gray = cv2.erode(image_np, kernel, iterations=1)
+    gray = cv2.dilate(gray, kernel, iterations=1)
+    gray = cv2.erode(gray, kernel, iterations=1)
 
     gray = gray.astype(np.uint8)
     gray = apply_threshold(gray, method)
