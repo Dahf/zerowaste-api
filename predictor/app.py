@@ -10,32 +10,7 @@ from scipy.ndimage import gaussian_filter
 
 app = Flask(__name__)
 
-regex = r"P\d{17}"
-
-def apply_threshold(img, argument):
-    try:
-        if argument in [1, 2, 3]:
-            sigma = {1: 9, 2: 7, 3: 5}[argument]
-            img = gaussian_filter(img, sigma=sigma)
-            _, img = cv2.threshold(img, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
-        elif argument in [4, 5]:
-            ksize = {4: 5, 5: 3}[argument]
-            img = cv2.medianBlur(img, ksize)
-            _, img = cv2.threshold(img, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
-        elif argument == 6:
-            img = gaussian_filter(img, sigma=5)
-            img = cv2.adaptiveThreshold(img, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 31, 2)
-        elif argument == 7:
-            img = cv2.medianBlur(img, 3)
-            img = cv2.adaptiveThreshold(img, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 31, 2)
-        else:
-            raise ValueError("Invalid method")
-    except Exception as e:
-        print(f"Error in apply_threshold: {e}")
-        return None
-    return img
-
-def vorverarbeitung(image, method):
+def vorverarbeitung(image):
     image_np = np.array(image)
 
     # Ensure image is converted to grayscale
@@ -47,10 +22,8 @@ def vorverarbeitung(image, method):
     gray = cv2.erode(gray, kernel, iterations=1)
 
     gray = gray.astype(np.uint8)
-    processed_gray = apply_threshold(gray, method)
-    
-    if processed_gray is None:
-        return ""
+
+    processed_gray = cv2.adaptiveThreshold(cv2.medianBlur(gray, 3), 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 31, 2)
 
     return pytesseract.image_to_string(processed_gray, lang='eng')
 
@@ -74,15 +47,9 @@ def find_match(regex, text):
 def predict():
     image_data = request.data
     image = Image.open(BytesIO(image_data)).convert('RGB')  # Ensure image is in RGB mode
-    found = []
-    for i in range(1, 8):
-        print(f"> The filter method {i} is now being applied.")
-        result = vorverarbeitung(image, i)
-        match = find_match(regex, result)
-        if match:
-            found.append(match)
+    result = vorverarbeitung(image)
 
-    return jsonify({"matches": found})
+    return jsonify({"matches": result})
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
