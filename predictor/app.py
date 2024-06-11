@@ -52,7 +52,7 @@ def predict():
     image_data = request.data
     image = Image.open(BytesIO(image_data)).convert('RGB')  # Ensure image is in RGB mode
     processed_image = preprocess_image(image)
-    result_text = pytesseract.image_to_string(processed_image, config='--psm 6', lang='eng')
+    result_text = pytesseract.image_to_string(processed_image, config='--psm 3', lang='eng')
     
     return jsonify({"result": result_text})
 
