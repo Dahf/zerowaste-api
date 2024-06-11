@@ -4,7 +4,7 @@ FROM pytorch/pytorch:latest
 # Set the working directory in the container
 WORKDIR /usr/src/app
 
-RUN pip install flask
+RUN pip install flask ultralytics
 
 # Copy the rest of the application
 COPY . .
