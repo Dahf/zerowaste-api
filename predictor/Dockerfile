@@ -14,7 +14,7 @@ RUN apt-get update && apt-get install -y \
     libfontconfig1 \
     libice6
 
-RUN pip install flask tensorflow langdetect pytesseract opencv-python-headless pillow scipy transformers
+RUN pip install flask tensorflow langdetect pytesseract opencv-python-headless pillow scipy transformers tensorrt
 
 # Copy the rest of the application
 COPY . .
