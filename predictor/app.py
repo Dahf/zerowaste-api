@@ -6,10 +6,13 @@ import torch
 import torchvision.transforms as transforms
 from PIL import Image
 from flask import Flask, jsonify, request
+from torchvision.models import resnet18
+
 
 app = Flask(__name__)
 
-model = torch.jit.load('best-2.pt')
+model = resnet18(pretrained=True)
+model.eval()
 
 img_class_map = None
 mapping_file_path = 'index_to_name.json'  # Human-readable names for Imagenet classes or your custom classes
