@@ -6,15 +6,10 @@ import torch
 import torchvision.transforms as transforms
 from PIL import Image
 from flask import Flask, jsonify, request
-from my_model_module import MyModel  # Import your model class
 
 app = Flask(__name__)
 
-# Load your model
-model_path = 'best-2.pt'  # Path to your custom model weights
-model = MyModel()  # Initialize your model
-model.load_state_dict(torch.load(model_path, map_location=torch.device('cpu')))
-model.eval()  # Set the model to evaluation mode
+model = torch.jit.load('best-2.pt')
 
 img_class_map = None
 mapping_file_path = 'index_to_name.json'  # Human-readable names for Imagenet classes or your custom classes
