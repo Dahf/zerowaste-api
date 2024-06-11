@@ -15,7 +15,7 @@ class_names = ["Address", "Date", "Item", "OrderId", "Subtotal", "Tax", "Title",
 @app.route('/')
 def home():
     return "Welcome to the Image Prediction API"
-
+    
 @app.route('/predict', methods=['POST'])
 def predict():
     # Get image buffer from request
@@ -24,7 +24,10 @@ def predict():
 
     output = model([image])
 
-    return output
+    # Convert output to a JSON-serializable format
+    output_dict = output.pandas().xyxy[0].to_dict(orient="records")
+
+    return jsonify(output_dict)
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
