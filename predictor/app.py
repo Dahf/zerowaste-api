@@ -28,11 +28,12 @@ def vorverarbeitung(image, method):
 
 
     image_np = np.array(image)
+    
+    gray = cv2.cvtColor(image_np, cv2.COLOR_BGR2GRAY)
 
     gray = cv2.resize(image_np, None, fx=1.5, fy=1.5, interpolation=cv2.INTER_CUBIC)
     # Konvertierung in Graustufen
-    gray = cv2.cvtColor(image_np, cv2.COLOR_BGR2GRAY)
-
+    
     kernel = np.ones((1, 1), np.uint8)
     gray = cv2.dilate(image_np, kernel, iterations=1)
     gray = cv2.erode(image_np, kernel, iterations=1)
@@ -64,8 +65,7 @@ def predict():
     image_data = request.data
     image = Image.open(BytesIO(image_data))
     found = {}
-    i = 1
-    while i < 8:
+    for i in range(1, 8):
         print("> The filter method " + str(i) + " is now being applied.")
         result = vorverarbeitung(image, i)
         match = find_match(regex, result)
@@ -76,8 +76,6 @@ def predict():
                 list = []
                 list.append(match)
                 found[file_name] = list
-        
-        i += 1
 
     return found
 
