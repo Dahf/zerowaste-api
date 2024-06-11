@@ -8,7 +8,6 @@ app = Flask(__name__)
 
 # Laden Sie das Modell
 model = torch.load('best-2.pt')
-model.eval()
 
 def process_image(image):
     # Preprocess image for model
