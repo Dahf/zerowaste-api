@@ -1,42 +1,20 @@
 import { PythonShell } from 'python-shell';
 
 export const getPrediction = async (req, res) => {
-    const imgBuffer = req.body;
-    console.log(req.body)
-    // Optionen für PythonShell
-    let options = {
-        mode: 'binary',
-        pythonOptions: ['-u'], // Unbuffered stdout
-        scriptPath: '', // Optional, falls das Skript in einem anderen Verzeichnis liegt
-        args: [] // Keine Argumente erforderlich
-    };
+    const imgBuffer = req.file.buffer;
 
-    let pyshell = new PythonShell('predict.py', options);
+    try {
+        // Senden Sie den Bildpuffer an den Python-Container
+        const response = await axios.post('http://python-predictor:5000/predict', imgBuffer, {
+            headers: {
+                'Content-Type': 'application/octet-stream'
+            }
+        });
 
-    let scriptOutput = '';
-
-    pyshell.stdout.on('data', (data) => {
-        scriptOutput += data.toString();
-    });
-
-    pyshell.stderr.on('data', (data) => {
-        console.error(`stderr: ${data}`);
-    });
-
-    pyshell.on('close', (code) => {
-        if (code !== 0) {
-            return res.status(500).send(`Python script exited with code ${code}`);
-        }
-
-        try {
-            const result = JSON.parse(scriptOutput);
-            
-            res.json(result);
-        } catch (error) {
-            res.status(500).send('Failed to parse predictions');
-        }
-    });
-
-    // Senden Sie den Bildpuffer an das Python-Skript
-    pyshell.send(imgBuffer).end();
+        // Rückgabe der Vorhersagen
+        res.json(response.data);
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Failed to get prediction from Python container');
+    }
 };
