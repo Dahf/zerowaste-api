@@ -13,22 +13,26 @@ app = Flask(__name__)
 regex = r"P\d{17}"
 
 def apply_threshold(img, argument):
-    if argument in [1, 2, 3]:
-        sigma = {1: 9, 2: 7, 3: 5}[argument]
-        img = gaussian_filter(img, sigma=sigma)
-        _, img = cv2.threshold(img, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
-    elif argument in [4, 5]:
-        ksize = {4: 5, 5: 3}[argument]
-        img = cv2.medianBlur(img, ksize)
-        _, img = cv2.threshold(img, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
-    elif argument == 6:
-        img = gaussian_filter(img, sigma=5)
-        img = cv2.adaptiveThreshold(img, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 31, 2)
-    elif argument == 7:
-        img = cv2.medianBlur(img, 3)
-        img = cv2.adaptiveThreshold(img, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 31, 2)
-    else:
-        return "Invalid method"
+    try:
+        if argument in [1, 2, 3]:
+            sigma = {1: 9, 2: 7, 3: 5}[argument]
+            img = gaussian_filter(img, sigma=sigma)
+            _, img = cv2.threshold(img, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+        elif argument in [4, 5]:
+            ksize = {4: 5, 5: 3}[argument]
+            img = cv2.medianBlur(img, ksize)
+            _, img = cv2.threshold(img, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+        elif argument == 6:
+            img = gaussian_filter(img, sigma=5)
+            img = cv2.adaptiveThreshold(img, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 31, 2)
+        elif argument == 7:
+            img = cv2.medianBlur(img, 3)
+            img = cv2.adaptiveThreshold(img, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 31, 2)
+        else:
+            raise ValueError("Invalid method")
+    except Exception as e:
+        print(f"Error in apply_threshold: {e}")
+        return None
     return img
 
 def vorverarbeitung(image, method):
@@ -43,9 +47,12 @@ def vorverarbeitung(image, method):
     gray = cv2.erode(gray, kernel, iterations=1)
 
     gray = gray.astype(np.uint8)
-    gray = apply_threshold(gray, method)
+    processed_gray = apply_threshold(gray, method)
+    
+    if processed_gray is None:
+        return ""
 
-    return pytesseract.image_to_string(gray, lang='eng')
+    return pytesseract.image_to_string(processed_gray, lang='eng')
 
 @app.route('/')
 def home():
