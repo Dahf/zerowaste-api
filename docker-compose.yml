@@ -1,7 +1,17 @@
 version: '3.8'
 services:
+  python-predictor:
+    build:
+      context: ./predictor
+      dockerfile: Dockerfile
+    ports:
+      - "5000:5000"
+    networks:
+      - app-network
   backend:
-    build: .
+    build:
+      context: ./express-app
+      dockerfile: Dockerfile
     container_name: zerowaste-api
     image: zerowaste-api
     command: pm2-runtime app.js -i max
@@ -24,6 +34,7 @@ services:
       - postgres
       - bridge
       - traefik_proxy-net
+      - app-network
     hostname: "0.0.0.0"
     ports:
       - "8088:8088" 
@@ -78,6 +89,8 @@ networks:
   traefik_proxy-net:
     external: true
   bridge:
+  app-network:
+    driver: bridge
 
 volumes:
     postgres:
