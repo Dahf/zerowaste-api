@@ -24,11 +24,8 @@ RUN pip install flask tensorflow langdetect pytesseract opencv-python-headless p
 # Copy the rest of the application
 COPY . .
 
-WORKDIR /usr/src/app/sk_invoice_receipts
-# Initialisieren Sie Git LFS und ziehen Sie die LFS-Dateien
 RUN git lfs pull
 
-WORKDIR /usr/src/app
 # Expose the application port
 EXPOSE 5000
 
