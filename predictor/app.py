@@ -7,10 +7,10 @@ from io import BytesIO
 app = Flask(__name__)
 
 # Laden Sie das Modell
-model = VisionEncoderDecoderModel.from_pretrained('sk_invoice_receipts')
+model = VisionEncoderDecoderModel.from_pretrained('/usr/src/app/sk_invoice_receipts')
 feature_extractor = ViTImageProcessor.from_pretrained(
-    'sk_invoice_receipts')
-tokenizer = AutoTokenizer.from_pretrained('sk_invoice_receipts')
+    '/usr/src/app/sk_invoice_receipts')
+tokenizer = AutoTokenizer.from_pretrained('/usr/src/app/sk_invoice_receipts')
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 model.to(device)
