@@ -1,5 +1,5 @@
 from flask import Flask, request, jsonify
-from PIL import Image
+from PIL import Image, ImageOps
 from io import BytesIO
 import pytesseract
 from langdetect import detect
@@ -15,7 +15,7 @@ def vorverarbeitung(image):
 
     # Ensure image is converted to grayscale
     gray = cv2.cvtColor(image_np, cv2.COLOR_BGR2GRAY)
-    gray = cv2.resize(gray, None, fx=1.5, fy=1.5, interpolation=cv2.INTER_CUBIC)
+    gray = cv2.resize(gray, None, fx=1.2, fy=1.2, interpolation=cv2.INTER_CUBIC)
 
     kernel = np.ones((1, 1), np.uint8)
     gray = cv2.dilate(gray, kernel, iterations=1)
@@ -24,8 +24,9 @@ def vorverarbeitung(image):
     gray = gray.astype(np.uint8)
 
     processed_gray = cv2.adaptiveThreshold(cv2.medianBlur(gray, 3), 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 31, 2)
-
-    return pytesseract.image_to_string(processed_gray, lang='eng')
+    config = ("--psm 6")
+    
+    return pytesseract.image_to_string(processed_gray, config, lang='eng')
 
 @app.route('/')
 def home():
@@ -47,6 +48,10 @@ def find_match(regex, text):
 def predict():
     image_data = request.data
     image = Image.open(BytesIO(image_data)).convert('RGB')  # Ensure image is in RGB mode
+    image = ImageOps.invert(image)
+    contrast = ImageEnhance.Contrast(image)
+    image = contrast.enhance(2)
+
     result = vorverarbeitung(image)
 
     return jsonify({"matches": result})
