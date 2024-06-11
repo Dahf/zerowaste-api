@@ -3,11 +3,12 @@ from PIL import Image
 import torch
 import torchvision.transforms as transforms
 from io import BytesIO
+from ultralytics import YOLO
 
 app = Flask(__name__)
 
 # Laden Sie das Modell
-model = torch.load('best-2.pt')
+model = YOLO('best-2.pt')
 
 class_names = ["Address", "Date", "Item", "OrderId", "Subtotal", "Tax", "Title", "TotalPrice"]
 
@@ -21,7 +22,7 @@ def predict():
     image_data = request.data
     image = Image.open(BytesIO(image_data))
 
-    output = model(image)
+    output = model([image])
 
     return jsonify(output)
 
