@@ -1,20 +1,8 @@
 version: '3.8'
 services:
-  python-predictor:
-    container_name: python-predictor
-    build:
-      context: ./predictor
-      dockerfile: Dockerfile
-    ports:
-      - "5000:5000"
-    networks:
-      - app-network
-    volumes:
-      - sk_invoice_receipts:/usr/src/app/sk_invoice_receipts
-      - ../:/usr/src/app/parent
   backend:
     build:
-      context: ./express-app
+      context: .
       dockerfile: Dockerfile
     container_name: zerowaste-api
     image: zerowaste-api
