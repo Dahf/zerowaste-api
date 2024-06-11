@@ -1,20 +1,16 @@
-# Verwenden Sie ein offizielles Python-Image als Basis
-FROM python:3.8-slim
+# Use the official PyTorch image as a base to avoid dependency issues
+FROM pytorch/pytorch:2.3.1-cuda11.8-cudnn8-devel
 
-# Setzen Sie das Arbeitsverzeichnis im Container
+# Set the working directory in the container
 WORKDIR /usr/src/app
 
-# Kopieren Sie die Anforderungen in das Arbeitsverzeichnis
-COPY requirements.txt .
+RUN pip install flask
 
-# Installieren Sie die Python-Abhängigkeiten
-RUN pip install flask torchvision torch
-
-# Kopieren Sie den Rest der Anwendung
+# Copy the rest of the application
 COPY . .
 
-# Exponieren Sie den Port
+# Expose the application port
 EXPOSE 5000
 
-# Festlegen des Startbefehls
+# Set the command to run the application
 CMD ["python", "app.py"]
