@@ -4,13 +4,17 @@ from io import BytesIO
 import pytesseract
 from langdetect import detect
 import cv2
+import numpy as np
 
 app = Flask(__name__)
 
+
 def vorverarbeitung(image):
+    # Konvertiere das Bild in ein NumPy-Array
+    image_np = np.array(image)
     
     # Konvertierung in Graustufen
-    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    gray = cv2.cvtColor(image_np, cv2.COLOR_BGR2GRAY)
     
     # Rauschunterdrückung mit GaussianBlur
     gray = cv2.GaussianBlur(gray, (5, 5), 0)
