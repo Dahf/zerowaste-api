@@ -7,7 +7,7 @@ from io import BytesIO
 app = Flask(__name__)
 
 # Laden Sie das Modell
-model = torch.jit.load('best-2.pt')
+model = torch.load('best-2.pt')
 model.eval()
 
 def process_image(image):
