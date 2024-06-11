@@ -7,9 +7,7 @@ import cv2
 
 app = Flask(__name__)
 
-def vorverarbeitung(image_path):
-    # Laden des Bildes
-    image = cv2.imread(image_path)
+def vorverarbeitung(image):
     
     # Konvertierung in Graustufen
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
