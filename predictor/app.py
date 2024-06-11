@@ -6,6 +6,7 @@ from langdetect import detect
 import cv2
 import numpy as np
 import re
+import sys
 from scipy.ndimage import gaussian_filter
 
 app = Flask(__name__)
@@ -47,7 +48,7 @@ def home():
 
 @app.route('/predict', methods=['POST'])
 def predict():
-    print("Predict Request")
+    print("Predict Request", file=sys.stdout)
     image_data = request.data
     image = Image.open(BytesIO(image_data)).convert('RGB')  # Ensure image is in RGB mode
     processed_image = preprocess_image(image)
