@@ -24,8 +24,6 @@ RUN pip install flask tensorflow langdetect pytesseract opencv-python-headless p
 # Copy the rest of the application
 COPY . .
 
-RUN git lfs pull
-
 # Expose the application port
 EXPOSE 5000
 
