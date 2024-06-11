@@ -35,7 +35,7 @@ def vorverarbeitung(image, method):
     gray = cv2.dilate(image_np, kernel, iterations=1)
     gray = cv2.erode(image_np, kernel, iterations=1)
 
-    gray = apply_threshold(img, method)
+    gray = apply_threshold(image_np, method)
     pytesseract.image_to_string(gray, lang='eng')
     return gray
 
