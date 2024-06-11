@@ -12,7 +12,8 @@ RUN apt-get update && apt-get install -y \
     libsm6 \
     libxrender1 \
     libfontconfig1 \
-    libice6
+    libice6 \
+    git-lfs
 
 RUN pip install flask tensorflow langdetect pytesseract opencv-python-headless pillow scipy transformers
 
