@@ -65,23 +65,17 @@ def find_match(regex, text):
 
 @app.route('/predict', methods=['POST'])
 def predict():
-    # Get image buffer from request
     image_data = request.data
-    image = Image.open(BytesIO(image_data))
-    found = {}
+    image = Image.open(BytesIO(image_data)).convert('RGB')  # Ensure image is in RGB mode
+    found = []
     for i in range(1, 8):
-        print("> The filter method " + str(i) + " is now being applied.")
+        print(f"> The filter method {i} is now being applied.")
         result = vorverarbeitung(image, i)
         match = find_match(regex, result)
         if match:
-            if file_name in found:
-                found[file_name].append(match)
-            else:
-                list = []
-                list.append(match)
-                found[file_name] = list
+            found.append(match)
 
-    return found
+    return jsonify({"matches": found})
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
