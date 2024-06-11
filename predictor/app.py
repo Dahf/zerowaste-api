@@ -34,31 +34,9 @@ def predict():
         image_data = request.data
         image = Image.open(BytesIO(image_data))
 
-        # Process image and make prediction
-        image_tensor = process_image(image)
-        output = model(image_tensor)
+        output = model(image)
 
-        # Get class probabilities
-        probabilities = torch.nn.functional.softmax(output, dim=1)
-        probabilities = probabilities.detach().numpy()[0]
-
-        # Get the index of the highest probability
-        class_index = probabilities.argmax()
-
-        # Get the predicted class and probability
-        predicted_class = class_names[class_index]
-        probability = probabilities[class_index]
-
-        # Sort class probabilities in descending order
-        class_probs = list(zip(class_names, probabilities))
-        class_probs.sort(key=lambda x: x[1], reverse=True)
-
-        # Return JSON response with prediction results
-        return jsonify({
-            'class_probs': class_probs,
-            'predicted_class': predicted_class,
-            'probability': probability
-        })
+        return jsonify(output)
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
