@@ -1,5 +1,5 @@
 # Use the official PyTorch image as a base to avoid dependency issues
-FROM pytorch/pytorch:2.3.1-cuda11.8-cudnn8-devel
+FROM pytorch/pytorch:latest
 
 # Set the working directory in the container
 WORKDIR /usr/src/app
