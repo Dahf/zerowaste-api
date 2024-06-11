@@ -22,7 +22,7 @@ def predict():
     image_data = request.data
     image = Image.open(BytesIO(image_data))
 
-    results = model([image], save=False)
+    results = model(image, imgsz=800, save=False)
     results_json = {"boxes":results[0].boxes.xyxy.tolist(),"classes":results[0].boxes.cls.tolist()}
     return {"result": results_json}
 
