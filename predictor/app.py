@@ -8,7 +8,7 @@ from ultralytics import YOLO
 app = Flask(__name__)
 
 # Laden Sie das Modell
-model = YOLO('best-2.pt')
+model = YOLO('best-2.tflite')
 
 class_names = ["Address", "Date", "Item", "OrderId", "Subtotal", "Tax", "Title", "TotalPrice"]
 
