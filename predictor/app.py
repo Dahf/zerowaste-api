@@ -44,8 +44,7 @@ def get_prediction(input_tensor):
 
 # Make the prediction human-readable
 def render_prediction(prediction_idx):
-    stridx = str(prediction_idx)
-    class_name = class_names[stridx]
+    class_name = class_names[prediction_idx]
 
     return prediction_idx, class_name
 
