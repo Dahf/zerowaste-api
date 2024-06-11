@@ -25,6 +25,8 @@ def apply_threshold(img, argument):
 
 def vorverarbeitung(image, method):
     # Konvertiere das Bild in ein NumPy-Array
+    image = image.astype("uint8")
+    
     image_np = np.array(image)
 
     gray = cv2.resize(image_np, None, fx=1.5, fy=1.5, interpolation=cv2.INTER_CUBIC)
