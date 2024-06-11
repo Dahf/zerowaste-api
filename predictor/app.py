@@ -23,7 +23,7 @@ def predict():
     image = Image.open(BytesIO(image_data))
 
     output = model([image])
-
+    print(output)
     return jsonify(output)
 
 if __name__ == '__main__':
