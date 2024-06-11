@@ -87,5 +87,4 @@ networks:
 volumes:
     postgres:
     pgadmin:
-    sk_invoice_receipts:
     uploads:
