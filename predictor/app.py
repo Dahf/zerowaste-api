@@ -22,9 +22,9 @@ def predict():
     image_data = request.data
     image = Image.open(BytesIO(image_data))
 
-    output = model([image])
-    print(output)
-    return jsonify(output)
+    results = model([image], save=False)
+    results_json = {"boxes":results[0].boxes.xyxy.tolist(),"classes":results[0].boxes.cls.tolist()}
+    return {"result": results_json}
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
