@@ -12,13 +12,20 @@ RUN apt-get update && apt-get install -y \
     libsm6 \
     libxrender1 \
     libfontconfig1 \
-    libice6 \
-    git-lfs
+    libice6
+
+RUN apt-get install -y git git-lfs
+
+# Installieren und initialisieren Sie Git LFS
+RUN git lfs install
 
 RUN pip install flask tensorflow langdetect pytesseract opencv-python-headless pillow scipy transformers
 
 # Copy the rest of the application
 COPY . .
+
+# Initialisieren Sie Git LFS und ziehen Sie die LFS-Dateien
+RUN git lfs pull
 
 # Expose the application port
 EXPOSE 5000
