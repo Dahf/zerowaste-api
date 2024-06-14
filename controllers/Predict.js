@@ -1,4 +1,4 @@
-import { PythonShell } from 'python-shell';
+import { searchProducts } from './Products';
 
 export const getPrediction = async (req, res) => {
     const imgBuffer = req.body;
@@ -16,6 +16,25 @@ export const getPrediction = async (req, res) => {
         }
 
         const data = await response.json();
+        const lineItems = data.line_items;
+
+        const searchedProducts = await Promise.all(lineItems.map(async (item) => {
+            try {
+                const products = await searchProducts(item.item_name, 1);
+                return {
+                    ...item,
+                    searchResults: products
+                };
+            } catch (error) {
+                console.error(`Error searching for item ${item.item_name}:`, error);
+                return {
+                    ...item,
+                    searchResults: []
+                };
+            }
+        }));
+
+        data.line_items = searchedProducts;
         res.json(data);
     } catch (error) {
         console.error(error);
