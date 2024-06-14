@@ -1,4 +1,4 @@
-import { searchProducts } from './Products';
+import { searchProducts } from './Products.js';
 
 export const getPrediction = async (req, res) => {
     const imgBuffer = req.body;
