@@ -77,3 +77,33 @@ export const getGroupProducts = async (groupId) => {
         console.error('Error fetching group meals:', error);
     }
 };
+
+function getImageUrl(productData, baseName, resolution = 'full') {
+    if (!productData.images) {
+        return null;
+    }
+
+    // Find the first key that starts with the base name
+    const imageName = Object.keys(productData.images).find(name => name.startsWith(baseName));
+    if (!imageName) {
+        return null;
+    }
+
+    const baseUrl = 'https://images.openfoodfacts.org/images/products';
+    let folderName = productData.code;
+
+    if (folderName.length > 8) {
+        folderName = folderName.replace(/(...)(...)(...)(.*)/, '$1/$2/$3/$4');
+    }
+
+    let filename;
+    if (/^\d+$/.test(imageName)) { // only digits
+        const resolutionSuffix = resolution === 'full' ? '' : `.${resolution}`;
+        filename = `${imageName}${resolutionSuffix}.jpg`;
+    } else {
+        const rev = productData.images[imageName].rev;
+        filename = `${imageName}.${rev}.${resolution}.jpg`;
+    }
+
+    return `${baseUrl}/${folderName}/${filename}`;
+}
