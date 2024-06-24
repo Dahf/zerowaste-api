@@ -13,7 +13,10 @@ import { fileURLToPath } from 'url';
 import fs from 'fs';
 import { verifyTokenAdmin } from "./middleware/VerifyToken.js";
 import bodyParser from "body-parser";
-import { PythonShell } from "python-shell";
+import GroupProduct from "./models/GroupProduct.js";
+import Group from "./models/Group.js";
+import MealModel from "./models/Meals.js";
+import GroupMeal from "./models/GroupMeal.js";
 
 
 dotenv.config();
@@ -138,6 +141,14 @@ Meal.belongsToMany(Ingredient, {
   as: 'tagFilter'
 });
 Ingredient.belongsToMany(Meal, { through: MealIngredient });
+
+
+Group.belongsToMany(Product, { through: GroupProduct });
+Product.belongsToMany(Group, { through: GroupProduct });
+
+Group.belongsToMany(MealModel, { through: GroupMeal });
+MealModel.belongsToMany(Group, { through: GroupMeal });
+
 
 const PORT = process.env.PORT || 8088;
 

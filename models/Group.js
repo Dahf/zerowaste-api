@@ -25,11 +25,4 @@ const Group = db.define('groups', {
   await db.sync();
 })();
 
-Group.belongsToMany(Product, { through: GroupProduct });
-Product.belongsToMany(Group, { through: GroupProduct });
-
-Group.belongsToMany(MealModel, { through: GroupMeal });
-MealModel.belongsToMany(Group, { through: GroupMeal });
-
-
 export default Group;
