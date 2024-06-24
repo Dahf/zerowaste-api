@@ -20,7 +20,7 @@ dotenv.config();
 const app = express();
 
 const corsOptions = {
-  origin: '*',
+  origin: 'https://silasbeckmann.de', // Domain des Frontends
   optionsSuccessStatus: 200,
   credentials: true,
 };
