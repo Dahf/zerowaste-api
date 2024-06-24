@@ -170,7 +170,11 @@ export const Login = async (req, res) => {
         const group = await Group.findOne({
             where: {
                 id: userGroup.groupId
-            }
+            },
+            include: [{
+                model: Users,
+                through: { attributes: [] } // Verhindert, dass die Zwischentabelle in den Ergebnissen angezeigt wird
+            }]
         });
         
         res.setHeader('Authorization', `Bearer ${accessToken}`);

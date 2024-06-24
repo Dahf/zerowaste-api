@@ -36,7 +36,11 @@ export const refreshToken = async (req, res) => {
         const group = await Group.findOne({
             where: {
                 id: userGroup.groupId
-            }
+            },
+            include: [{
+                model: Users,
+                through: { attributes: [] } // Verhindert, dass die Zwischentabelle in den Ergebnissen angezeigt wird
+            }]
         });
 
         jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, (err, decoded) => {
