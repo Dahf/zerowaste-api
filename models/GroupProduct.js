@@ -1,7 +1,7 @@
 import { Sequelize } from 'sequelize';
 import db from '../config/Database.js';
 import Group from './Group.js';
-import Product from './Product.js';
+import Product from './Products.js';
 
 const { DataTypes } = Sequelize;
 
