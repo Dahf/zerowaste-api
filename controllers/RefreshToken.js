@@ -38,7 +38,7 @@ export const refreshToken = async (req, res) => {
                 { expiresIn: '15m' } // Adjusted from 15s for practical use
             );
             res.setHeader('Authorization', `Bearer ${accessToken}`);
-            res.json({ accessToken });
+            res.json({ user, accessToken });
         });
     } catch (error) {
         console.error("Error in refreshToken function:", error);
