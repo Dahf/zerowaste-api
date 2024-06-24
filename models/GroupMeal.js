@@ -1,7 +1,7 @@
 import { Sequelize } from 'sequelize';
 import db from '../config/Database.js';
 import Group from './Group.js';
-import Meal from './Meal.js';
+import MealIngredient from './MealIngredients.js';
 
 const { DataTypes } = Sequelize;
 
@@ -16,7 +16,7 @@ const GroupMeal = db.define('group_meals', {
   mealId: {
     type: DataTypes.INTEGER,
     references: {
-      model: Meal,
+      model: MealIngredient,
       key: 'id'
     }
   }
