@@ -1,5 +1,7 @@
 import { Sequelize } from "sequelize";
 import db from "../config/Database.js";
+import GroupMeal from "./GroupMeal.js";
+import Group from "./Group.js";
 const { DataTypes } = Sequelize;
 
 const MealModel = db.define('meals',{

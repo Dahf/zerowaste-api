@@ -6,6 +6,7 @@ import { refreshToken } from "../controllers/RefreshToken.js";
 import { getProductByBarcode, searchProducts } from "../controllers/Products.js";
 import Product from "../models/Products.js";
 import { getPrediction } from "../controllers/Predict.js";
+import { addMealToGroup, addProductToGroup, getGroupMeals } from "../controllers/Group.js";
 
 const router = express.Router();
 
@@ -44,6 +45,40 @@ router.get('/random-meals', getRandomMeals);
 router.get('/combination', getMealCombination);
 router.get('/products', getProductByBarcode);
 router.post('/predict', getPrediction);
+
+// Route zum Hinzufügen eines Produkts zu einer Gruppe
+router.post('/group/:groupId/products/:productId', verifyToken, async (req, res) => {
+  const { groupId, productId } = req.params;
+  try {
+      await addProductToGroup(groupId, productId);
+      res.status(200).send(`Product ${productId} added to Group ${groupId}`);
+  } catch (error) {
+      res.status(500).send(error.message);
+  }
+});
+
+// Route zum Hinzufügen eines Meals zu einer Gruppe
+router.post('/group/:groupId/meals/:mealId', verifyToken, async (req, res) => {
+  const { groupId, mealId } = req.params;
+  try {
+      await addMealToGroup(groupId, mealId);
+      res.status(200).send(`Meal ${mealId} added to Group ${groupId}`);
+  } catch (error) {
+      res.status(500).send(error.message);
+  }
+});
+
+// Route zum Abrufen der Meals einer Gruppe
+router.get('/group/:groupId/meals', verifyToken, async (req, res) => {
+  const { groupId } = req.params;
+  try {
+      const meals = await getGroupMeals(groupId);
+      res.status(200).json(meals);
+  } catch (error) {
+      res.status(500).send(error.message);
+  }
+});
+
 
 router.get('/products/search', async (req, res) => {
    try {

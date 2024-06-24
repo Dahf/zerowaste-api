@@ -91,9 +91,6 @@ app.post('/meal', verifyTokenAdmin, upload.single('image'), async (req, res) => 
       image: publicUrl
     });
     
-    console.log(formData);
-    console.log(JSON.parse(formData.ingredients));
-    
     if (Array.isArray(JSON.parse(formData.ingredients)) && JSON.parse(formData.ingredients).length > 0) {
       try {
         const ingredientPromises = JSON.parse(formData.ingredients).map(async (ingredient) => {

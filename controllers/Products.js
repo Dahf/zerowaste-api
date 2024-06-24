@@ -33,6 +33,7 @@ function getImageUrl(productData, baseName, resolution = 'full') {
 }
 
 
+
 export const getProductByBarcode = async (req, res) => {
     const { barcode } = req.query;
     try {
