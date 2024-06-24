@@ -6,7 +6,7 @@ import { refreshToken } from "../controllers/RefreshToken.js";
 import { getProductByBarcode, searchProducts } from "../controllers/Products.js";
 import Product from "../models/Products.js";
 import { getPrediction } from "../controllers/Predict.js";
-import { addMealToGroup, addProductToGroup, getGroupMeals } from "../controllers/Group.js";
+import { addMealToGroup, addProductToGroup, getGroupMeals, getGroupProducts } from "../controllers/Group.js";
 
 const router = express.Router();
 
@@ -73,6 +73,17 @@ router.get('/group/:groupId/meals', verifyToken, async (req, res) => {
   const { groupId } = req.params;
   try {
       const meals = await getGroupMeals(groupId);
+      res.status(200).json(meals);
+  } catch (error) {
+      res.status(500).send(error.message);
+  }
+});
+
+// Route zum Abrufen der Meals einer Gruppe
+router.get('/group/:groupId/products', verifyToken, async (req, res) => {
+  const { groupId } = req.params;
+  try {
+      const meals = await getGroupProducts(groupId);
       res.status(200).json(meals);
   } catch (error) {
       res.status(500).send(error.message);
