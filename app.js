@@ -20,12 +20,12 @@ dotenv.config();
 const app = express();
 
 const corsOptions = {
-  origin: 'https://silasbeckmann.de', // Domain des Frontends
+  origin: '*',
   optionsSuccessStatus: 200,
   credentials: true,
 };
 
-app.use(cors());
+app.use(cors(corsOptions));
 app.use(bodyParser.raw({ type: 'application/octet-stream', limit: '10mb' }));
 app.use(cookieParser());
 app.use(express.json());
