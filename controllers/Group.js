@@ -57,24 +57,28 @@ export const getGroupMeals = async (groupId) => {
 
 export const getGroupProducts = async (groupId) => {
     try {
-        const groupMeals = await Group.findByPk(groupId, {
+        const groupProducts = await Group.findByPk(groupId, {
             include: [
-                { model: Product, through: { attributes: [] }, attributes: { exclude: [] } } // Alle Felder des Meal-Modells
+                { model: Product, through: { attributes: [] }, attributes: { exclude: [] } } // Alle Felder des Produkt-Modells
             ],
             attributes: [] // Keine Gruppeninformationen zurückgeben
         });
 
-        if (!groupMeals) {
+        if (!groupProducts) {
             throw new Error('Group not found');
         }
-        const productData = groupMeals.products
-        productData.imageFrontUrl = getImageUrl(productData, 'front');
-        productData.imageIngredientsUrl = getImageUrl(productData, 'ingredients');
-        productData.imageNutritionUrl = getImageUrl(productData, 'nutrition');
-        console.log(productData);
-        return productData;
+
+        const products = groupProducts.products.map(product => {
+            product.imageFrontUrl = getImageUrl(product, 'front');
+            product.imageIngredientsUrl = getImageUrl(product, 'ingredients');
+            product.imageNutritionUrl = getImageUrl(product, 'nutrition');
+            return product;
+        });
+
+        console.log(products);
+        return products;
     } catch (error) {
-        console.error('Error fetching group meals:', error);
+        console.error('Error fetching group products:', error);
     }
 };
 
