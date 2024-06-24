@@ -25,7 +25,7 @@ const corsOptions = {
   credentials: true,
 };
 
-app.use(cors(corsOptions));
+app.use(cors());
 app.use(bodyParser.raw({ type: 'application/octet-stream', limit: '10mb' }));
 app.use(cookieParser());
 app.use(express.json());
