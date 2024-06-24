@@ -1,3 +1,5 @@
+import Group from "../models/Group.js";
+import UserGroup from "../models/UserGroup.js";
 import Users from "../models/UserModel.js";
 import jwt from "jsonwebtoken";
  
@@ -12,13 +14,31 @@ export const refreshToken = async (req, res) => {
         const user = await Users.findOne({
             where: {
                 refresh_token: refreshToken
-            }
+            },
+            include: ['group']
         });
 
         if (!user) {
             console.log("No user found with the provided refresh token");
             return res.sendStatus(403); // Forbidden
         }
+
+        const userGroup = await UserGroup.findOne({
+            where: {
+                userId: user.id
+            }
+        });
+
+        if (!userGroup) {
+            console.log("No group found for the user");
+            return res.sendStatus(403); // Forbidden
+        }
+
+        const group = await Group.findOne({
+            where: {
+                id: userGroup.groupId
+            }
+        });
 
         jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, (err, decoded) => {
             if (err) {
@@ -37,8 +57,9 @@ export const refreshToken = async (req, res) => {
                 process.env.ACCESS_TOKEN_SECRET,
                 { expiresIn: '15m' } // Adjusted from 15s for practical use
             );
+            
             res.setHeader('Authorization', `Bearer ${accessToken}`);
-            res.json({ user, accessToken });
+            res.json({ user, accessToken, group });
         });
     } catch (error) {
         console.error("Error in refreshToken function:", error);

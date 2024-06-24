@@ -27,6 +27,10 @@ const UserGroup = db.define('user_groups', {
 User.belongsToMany(Group, { through: UserGroup });
 Group.belongsToMany(User, { through: UserGroup });
 
+User.hasMany(UserGroup, { foreignKey: 'userId' });
+UserGroup.belongsTo(Group, { foreignKey: 'groupId' });
+
+
 (async () => {
   await db.sync();
 })();
