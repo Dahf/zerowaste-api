@@ -145,7 +145,7 @@ export const Login = async (req, res) => {
         });
         
         res.setHeader('Authorization', `Bearer ${accessToken}`);
-        res.status(200).json({ accessToken });
+        res.status(200).json({ user, accessToken });
     } catch (error) {
         console.error("Login error:", error);
         res.status(500).json({ msg: "Internal server error" });

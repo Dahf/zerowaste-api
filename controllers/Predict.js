@@ -20,17 +20,21 @@ export const getPrediction = async (req, res) => {
 
         const searchedProducts = await Promise.all(lineItems.map(async (item) => {
             try {
-                const products = await searchProducts(item.item_name, 1);
-                return {
-                    ...item,
-                    searchResults: products
-                };
+                if (item.item_value >= 0) {
+                    const products = await searchProducts(item.item_name, 1);
+                    return {
+                        ...item,
+                        searchResults: products
+                    };
+                } else {
+                    return {
+                        ...item,
+                        searchResults: []
+                    };
+                }
             } catch (error) {
                 console.error(`Error searching for item ${item.item_name}:`, error);
-                return {
-                    ...item,
-                    searchResults: []
-                };
+                
             }
         }));
 
