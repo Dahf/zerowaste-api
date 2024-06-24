@@ -69,10 +69,12 @@ export const getGroupProducts = async (groupId) => {
         }
 
         const products = groupProducts.products.map(product => {
-            product.imageFrontUrl = getImageUrl(product, 'front');
-            product.imageIngredientsUrl = getImageUrl(product, 'ingredients');
-            product.imageNutritionUrl = getImageUrl(product, 'nutrition');
-            return product;
+            return {
+                ...product.toJSON(),
+                imageFrontUrl: getImageUrl(product, 'front'),
+                imageIngredientsUrl: getImageUrl(product, 'ingredients'),
+                imageNutritionUrl: getImageUrl(product, 'nutrition')
+            };
         });
 
         console.log(products);
