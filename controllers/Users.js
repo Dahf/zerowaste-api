@@ -76,7 +76,7 @@ export const Register = async(req, res) => {
         const salt = await bcrypt.genSalt();
         const hashPassword = await bcrypt.hash(password, salt);
         try {
-            await Users.create({
+            const newUser = await Users.create({
                 vorname: vorname,
                 nachname: nachname,
                 plz: plz,
@@ -99,7 +99,7 @@ export const Register = async(req, res) => {
           
               // Füge den Benutzer der Gruppe hinzu
               await UserGroup.create({
-                userId: user.id,
+                userId: newUser.id,
                 groupId: group.id
               });
 
