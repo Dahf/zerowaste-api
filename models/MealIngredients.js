@@ -6,14 +6,14 @@ import Meal from "./Meals.js";
 
 const MealIngredient = db.define('MealIngredient', {
   mealId: {
-      type: Sequelize.INTEGER,
+      type: DataTypes.INTEGER,
       references: {
           model: Meal,
           key: 'id'
       }
   },
   ingredientId: {
-      type: Sequelize.INTEGER,
+      type: DataTypes.INTEGER,
       references: {
           model: Ingredient,
           key: 'id'
