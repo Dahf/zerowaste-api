@@ -67,11 +67,11 @@ export const getGroupProducts = async (groupId) => {
         if (!groupMeals) {
             throw new Error('Group not found');
         }
-        const productData = groupMeals.products.toJSON(); // Assuming `product` is a Sequelize instance
+        const productData = groupMeals.products
         productData.imageFrontUrl = getImageUrl(productData, 'front');
         productData.imageIngredientsUrl = getImageUrl(productData, 'ingredients');
         productData.imageNutritionUrl = getImageUrl(productData, 'nutrition');
-      
+        console.log(productData);
         return productData;
     } catch (error) {
         console.error('Error fetching group meals:', error);
