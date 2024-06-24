@@ -72,7 +72,7 @@ export const getGroupProducts = async (groupId) => {
         productData.imageIngredientsUrl = getImageUrl(productData, 'ingredients');
         productData.imageNutritionUrl = getImageUrl(productData, 'nutrition');
       
-        return groupMeals.productData;
+        return productData;
     } catch (error) {
         console.error('Error fetching group meals:', error);
     }
