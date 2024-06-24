@@ -95,7 +95,6 @@ export const getMealCombination = async(req, res) => {
 }
 export const getMeal = async (req, res) => {
     const { ingredients, lan, id } = req.query;
-    console.log(req.query)
     try {
         if (id) {
             const result = await Meal.findByPk(id, {

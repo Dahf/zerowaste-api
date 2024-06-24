@@ -4,11 +4,10 @@ import db from "../config/Database.js";
 const { DataTypes } = Sequelize;
  
 const Users = db.define('users', {
-    kndnr: {
-        type: DataTypes.INTEGER
-    },
-    anrede:{
-        type: DataTypes.STRING
+    id: {
+        type: DataTypes.INTEGER,
+        autoIncrement: true,
+        primaryKey: true
     },
     vorname:{
         type: DataTypes.STRING
@@ -23,27 +22,6 @@ const Users = db.define('users', {
         validate: {
             isEmail: true,
         },
-    },
-    straße:{
-        type: DataTypes.STRING
-    },
-    hausnummer:{
-        type: DataTypes.INTEGER
-    },
-    plz:{
-        type: DataTypes.INTEGER
-    },
-    ort:{
-        type: DataTypes.STRING
-    },
-    land:{
-        type: DataTypes.STRING
-    },
-    geburtstag:{
-        type: DataTypes.DATE
-    },
-    phone:{
-        type: DataTypes.BIGINT
     },
     rank:{
         type: DataTypes.INTEGER

@@ -1,6 +1,7 @@
 import Users from "../models/UserModel.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import Group from "../models/Group.js";
 
 export const getUsers = async(req, res) => {
     try {
@@ -91,6 +92,15 @@ export const Register = async(req, res) => {
                 kndnr: 0,
                 confirmed: false,
             });
+            const [group, created] = await Group.findOrCreate({
+                where: { name: vorname + "_" + nachname }
+              });
+          
+              // Füge den Benutzer der Gruppe hinzu
+              await UserGroup.create({
+                userId: user.id,
+                groupId: group.id
+              });
             res.json({msg: "Registration Successful"});
         } catch (error) {
             console.log(error);
