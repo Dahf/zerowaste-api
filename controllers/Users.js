@@ -155,9 +155,26 @@ export const Login = async (req, res) => {
             path: "/",
             maxAge: 24 * 60 * 60 * 1000  // 1 day
         });
+
+        const userGroup = await UserGroup.findOne({
+            where: {
+                userId: user.id
+            }
+        });
+
+        if (!userGroup) {
+            console.log("No group found for the user");
+            return res.sendStatus(403); // Forbidden
+        }
+
+        const group = await Group.findOne({
+            where: {
+                id: userGroup.groupId
+            }
+        });
         
         res.setHeader('Authorization', `Bearer ${accessToken}`);
-        res.status(200).json({ user, accessToken });
+        res.status(200).json({ user, accessToken, group });
     } catch (error) {
         console.error("Login error:", error);
         res.status(500).json({ msg: "Internal server error" });

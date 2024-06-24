@@ -14,8 +14,7 @@ export const refreshToken = async (req, res) => {
         const user = await Users.findOne({
             where: {
                 refresh_token: refreshToken
-            },
-            include: ['group']
+            }
         });
 
         if (!user) {
