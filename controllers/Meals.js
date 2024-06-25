@@ -269,16 +269,36 @@ export const assignProductsToMealInGroup = async (groupId, mealId, productIds) =
           throw new Error('Meal not found');
       }
 
-      // Produkte zuweisen und groupId in der Zwischentabelle speichern
-      const mealProducts = productIds.map(productId => ({
-          mealId: mealId,
-          productId: productId,
-          groupId: groupId
-      }));
-      await MealProduct.bulkCreate(mealProducts);
+      // Bestehende Zuordnungen abrufen
+      const existingAssignments = await MealProduct.findAll({
+          where: {
+              mealId: mealId,
+              groupId: groupId,
+              productId: {
+                  [Op.in]: productIds
+              }
+          }
+      });
+
+      // IDs der bereits zugewiesenen Produkte extrahieren
+      const existingProductIds = existingAssignments.map(assignment => assignment.productId);
+
+      // Neue Zuordnungen filtern
+      const newProductIds = productIds.filter(productId => !existingProductIds.includes(productId));
+
+      // Nur neue Zuordnungen erstellen
+      if (newProductIds.length > 0) {
+          const mealProducts = newProductIds.map(productId => ({
+              mealId: mealId,
+              productId: productId,
+              groupId: groupId
+          }));
+          await MealProduct.bulkCreate(mealProducts);
+      }
 
       return meal;
   } catch (error) {
       console.error('Error assigning products to meal in group:', error);
+      throw error;
   }
 };
