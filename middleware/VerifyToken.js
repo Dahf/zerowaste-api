@@ -32,7 +32,6 @@ export const verifyGroupToken = async (req, res, next) => {
         const decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
         req.user = decoded;
         
-        console.log(decoded)
         // Überprüfen, ob die groupId im Anforderungskörper angegeben ist
         const groupId = req.body.groupId || req.params.groupId;
         if (!groupId) {
@@ -45,7 +44,7 @@ export const verifyGroupToken = async (req, res, next) => {
         // Überprüfen, ob der Benutzer Mitglied der angegebenen Gruppe ist
         const userGroup = await UserGroup.findOne({
             where: {
-                userId: req.user.id,
+                userId: req.user.userId,
                 groupId: groupId
             }
         });
