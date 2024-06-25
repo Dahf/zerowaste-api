@@ -31,7 +31,8 @@ export const verifyGroupToken = async (req, res, next) => {
     try {
         const decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
         req.user = decoded;
-
+        
+        console.log(decoded)
         // Überprüfen, ob die groupId im Anforderungskörper angegeben ist
         const groupId = req.body.groupId || req.params.groupId;
         if (!groupId) {
