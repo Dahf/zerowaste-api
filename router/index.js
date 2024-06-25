@@ -64,47 +64,58 @@ router.post('/assign-products', verifyGroupToken, async (req, res) => {
 // Route zum Hinzufügen eines Produkts zu einer Gruppe
 router.post('/group/:groupId/products/:productId', verifyGroupToken, async (req, res) => {
   const { groupId, productId } = req.params;
+  if (!groupId || !productId) {
+    return res.status(400).send("groupId und productId müssen angegeben werden.");
+  }
   try {
-      await addProductToGroup(groupId, productId);
-      res.status(200).send(`Product ${productId} added to Group ${groupId}`);
+    await addProductToGroup(groupId, productId);
+    res.status(200).send(`Product ${productId} added to Group ${groupId}`);
   } catch (error) {
-      res.status(500).send(error.message);
+    res.status(500).send(error.message);
   }
 });
 
 // Route zum Hinzufügen eines Meals zu einer Gruppe
 router.post('/group/:groupId/meals/:mealId', verifyGroupToken, async (req, res) => {
   const { groupId, mealId } = req.params;
+  if (!groupId || !mealId) {
+    return res.status(400).send("groupId und mealId müssen angegeben werden.");
+  }
   try {
-      await addMealToGroup(groupId, mealId);
-      res.status(200).send(`Meal ${mealId} added to Group ${groupId}`);
+    await addMealToGroup(groupId, mealId);
+    res.status(200).send(`Meal ${mealId} added to Group ${groupId}`);
   } catch (error) {
-      res.status(500).send(error.message);
+    res.status(500).send(error.message);
   }
 });
 
 // Route zum Abrufen der Meals einer Gruppe
 router.get('/group/:groupId/meals', verifyGroupToken, async (req, res) => {
   const { groupId } = req.params;
+  if (!groupId) {
+    return res.status(400).send("groupId muss angegeben werden.");
+  }
   try {
-      const meals = await getGroupMeals(groupId);
-      res.status(200).json(meals);
+    const meals = await getGroupMeals(groupId);
+    res.status(200).json(meals);
   } catch (error) {
-      res.status(500).send(error.message);
+    res.status(500).send(error.message);
   }
 });
 
 // Route zum Abrufen der Products einer Gruppe
 router.get('/group/:groupId/products', verifyGroupToken, async (req, res) => {
   const { groupId } = req.params;
+  if (!groupId) {
+    return res.status(400).send("groupId muss angegeben werden.");
+  }
   try {
-      const meals = await getGroupProducts(groupId);
-      res.status(200).json(meals);
+    const products = await getGroupProducts(groupId);
+    res.status(200).json(products);
   } catch (error) {
-      res.status(500).send(error.message);
+    res.status(500).send(error.message);
   }
 });
-
 
 router.get('/products/search', async (req, res) => {
    try {
