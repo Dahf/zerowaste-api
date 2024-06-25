@@ -23,7 +23,7 @@ export const verifyToken = (req, res, next) => {
 export const verifyGroupToken = async (req, res, next) => {
     const authHeader = req.headers['authorization'];
     const token = authHeader && authHeader.split(' ')[1];
-    
+
     if (!token) {
         return res.status(401).json({ error: 'Access denied. No token provided.' });
     }
@@ -33,7 +33,10 @@ export const verifyGroupToken = async (req, res, next) => {
         req.user = decoded;
 
         // Überprüfen, ob die groupId im Anforderungskörper angegeben ist
-        const { groupId } = req.body;
+        const groupId = req.body.groupId || req.params.groupId;
+        if (!groupId) {
+            return res.status(400).json({ error: 'groupId must be provided.' });
+        }
         if (!groupId) {
             return res.status(400).json({ error: 'groupId must be provided.' });
         }
