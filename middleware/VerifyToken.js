@@ -1,5 +1,6 @@
 import jwt from "jsonwebtoken";
 import Users from "../models/UserModel.js";
+import UserGroup from "../models/UserGroup.js";
 
 export const verifyToken = (req, res, next) => {
     const authHeader = req.headers['authorization'];
@@ -18,7 +19,8 @@ export const verifyToken = (req, res, next) => {
     });
 };
 
-export const verifyGroupToken = (req, res, next) => {
+
+export const verifyGroupToken = async (req, res, next) => {
     const token = req.header('Authorization').replace('Bearer ', '');
 
     if (!token) {
@@ -29,10 +31,22 @@ export const verifyGroupToken = (req, res, next) => {
         const decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
         req.user = decoded;
 
-        // Überprüfen, ob die groupId im Token mit der groupId im Anforderungskörper übereinstimmt
+        // Überprüfen, ob die groupId im Anforderungskörper angegeben ist
         const { groupId } = req.body;
-        if (groupId && groupId !== req.user.groupId) {
-            return res.status(403).json({ error: 'Access denied. Invalid groupId.' });
+        if (!groupId) {
+            return res.status(400).json({ error: 'groupId must be provided.' });
+        }
+
+        // Überprüfen, ob der Benutzer Mitglied der angegebenen Gruppe ist
+        const userGroup = await UserGroup.findOne({
+            where: {
+                userId: req.user.id,
+                groupId: groupId
+            }
+        });
+
+        if (!userGroup) {
+            return res.status(403).json({ error: 'Access denied. User is not a member of the specified group.' });
         }
 
         next();

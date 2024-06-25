@@ -139,6 +139,7 @@ Meal.belongsToMany(Ingredient, {
   otherKey: 'ingredientId',
   as: 'tagFilter'
 });
+
 Ingredient.belongsToMany(Meal, { through: MealIngredient });
 
 
