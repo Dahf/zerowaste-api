@@ -157,61 +157,71 @@ export const getMeal = async (req, res) => {
         res.status(500).send('Server error: ' + error.message);
     }
   };
-
   export const getTopGenericNames = async (specificIngredients) => {
     const ingredientCounts = {};
-  
+
     for (const ingredientName of specificIngredients) {
-      const singularName = pluralize.singular(ingredientName);
-      const pluralName = pluralize.plural(ingredientName);
-  
-      const searchTerms = [singularName, pluralName];
-  
-      for (const term of searchTerms) {
-        try {
-          // Finden aller Zutaten mit dem spezifischen Namen (singular und plural)
-          const ingredients = await Ingredient.findAll({
-            where: {
-              name: {
-                [Op.iLike]: `%${term}%`
-              }
+        console.log(`Verarbeite Zutat: ${ingredientName}`);
+        
+        const singularName = pluralize.singular(ingredientName);
+        const pluralName = pluralize.plural(ingredientName);
+        
+        console.log(`Singular: ${singularName}, Plural: ${pluralName}`);
+
+        const searchTerms = [singularName, pluralName];
+
+        for (const term of searchTerms) {
+            try {
+                console.log(`Suche nach Zutaten mit dem Begriff: ${term}`);
+                
+                // Finden aller Zutaten mit dem spezifischen Namen (singular und plural)
+                const ingredients = await Ingredient.findAll({
+                    where: {
+                        name: {
+                            [Op.iLike]: `%${term}%`
+                        }
+                    }
+                });
+                
+                console.log(`Gefundene Zutaten für ${term}: ${ingredients.length}`);
+
+                if (!ingredients.length) {
+                    console.log(`Keine Zutaten gefunden für: ${term}`);
+                    continue;
+                }
+
+                for (const ingredient of ingredients) {
+                    console.log(`Verarbeite Zutat: ${ingredient.name}`);
+
+                    // Zählen der Mahlzeiten, die diese Zutat enthalten
+                    const result = await Meal.findAndCountAll({
+                        include: {
+                            model: Ingredient,
+                            where: { id: ingredient.id }
+                        }
+                    });
+
+                    console.log(`Gefundene Mahlzeiten für Zutat ${ingredient.name} (ID: ${ingredient.id}): ${result.count}`);
+
+                    if (!ingredientCounts[ingredient.name]) {
+                        ingredientCounts[ingredient.name] = 0;
+                    }
+                    ingredientCounts[ingredient.name] += result.count;
+                }
+            } catch (error) {
+                console.error(`Fehler beim Abrufen der Zutaten für ${term}:`, error);
             }
-          });
-  
-          if (!ingredients.length) {
-            console.log(`Keine Zutaten gefunden für: ${term}`);
-            continue;
-          }
-  
-          for (const ingredient of ingredients) {
-            // Zählen der Mahlzeiten, die diese Zutat enthalten
-            const result = await Meal.findAndCountAll({
-              include: {
-                model: Ingredient,
-                where: { id: ingredient.id }
-              }
-            });
-  
-            console.log(`Gefundene Mahlzeiten für Zutat ${ingredient.name} (ID: ${ingredient.id}): ${result.count}`);
-  
-            if (!ingredientCounts[ingredient.name]) {
-              ingredientCounts[ingredient.name] = 0;
-            }
-            ingredientCounts[ingredient.name] += result.count;
-          }
-        } catch (error) {
-          console.error(`Fehler beim Abrufen der Zutaten für ${term}:`, error);
         }
-      }
     }
-  
+
     // Sammeln aller generischen Namen
     const genericNames = Object.keys(ingredientCounts);
-    
+
     console.log(`Alle generischen Namen: ${genericNames.join(', ')}`);
-  
+
     return genericNames;
   };
+
 
   export const getAllUniqueCategories = async (req, res) => {
     try {

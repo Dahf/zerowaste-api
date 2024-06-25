@@ -133,6 +133,8 @@ router.get('/top-generic-name', async (req, res) => {
       ingredientsArray.map(async ing => await translateText(ing, "en"))
   );
 
+  console.log(translatedIngredients)
+
    try {
      const topGenericName = await getTopGenericNames(translatedIngredients);
      res.json({ topGenericName });
