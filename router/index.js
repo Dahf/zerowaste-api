@@ -105,7 +105,7 @@ router.get('/group/:groupId/meals', verifyGroupToken, async (req, res) => {
 
 // Route zum Abrufen der Products einer Gruppe
 router.get('/group/:groupId/products', verifyGroupToken, async (req, res) => {
-  res.status(400).send(req);
+  return res.status(400).send(req);
   const { groupId } = req.params;
   if (!groupId) {
     return res.status(400).send("groupId muss angegeben werden.");
