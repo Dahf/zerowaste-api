@@ -49,8 +49,6 @@ export const getGroupMeals = async (groupId) => {
             throw new Error('Group not found');
         }
 
-        console.log(groupMeals.meals);
-
         return groupMeals.meals; // Nur die Meals zurückgeben
     } catch (error) {
         console.error('Error fetching group meals:', error);
