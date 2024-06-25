@@ -17,6 +17,7 @@ import GroupProduct from "./models/GroupProduct.js";
 import Group from "./models/Group.js";
 import MealModel from "./models/Meals.js";
 import GroupMeal from "./models/GroupMeal.js";
+import MealProduct from "./models/MealProduct.js";
 
 
 dotenv.config();
@@ -148,6 +149,12 @@ Product.belongsToMany(Group, { through: GroupProduct });
 
 Group.belongsToMany(MealModel, { through: GroupMeal });
 MealModel.belongsToMany(Group, { through: GroupMeal });
+
+MealModel.belongsToMany(Product, { through: MealProduct });
+Product.belongsToMany(MealModel, { through: MealProduct });
+
+Group.hasMany(MealProduct, { foreignKey: 'groupId' });
+MealProduct.belongsTo(Group, { foreignKey: 'groupId' });
 
 
 const PORT = process.env.PORT || 8088;

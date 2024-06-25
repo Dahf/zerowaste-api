@@ -4,6 +4,8 @@ import { Op, Sequelize } from 'sequelize';
 import MealIngredient from "../models/MealIngredients.js";
 import db from "../config/Database.js";
 import pluralize from "pluralize";
+import MealProduct from "../models/MealProduct.js";
+import Group from "../models/Group.js";
 
 async function translateText(text, targetLang, sourceLang = 'auto') {
     const response = await fetch("https://translate.silasbeckmann.de/translate", {
@@ -249,5 +251,34 @@ export const getRandomMeals = async (req, res) => {
   } catch (error) {
     console.error('Error fetching random meals:', error);
     res.status(500).json({ error: 'Internal Server Error' });
+  }
+};
+
+
+export const assignProductsToMealInGroup = async (groupId, mealId, productIds) => {
+  try {
+      // Überprüfen, ob die Gruppe existiert
+      const group = await Group.findByPk(groupId);
+      if (!group) {
+          throw new Error('Group not found');
+      }
+
+      // Überprüfen, ob das Meal existiert
+      const meal = await Meal.findByPk(mealId);
+      if (!meal) {
+          throw new Error('Meal not found');
+      }
+
+      // Produkte zuweisen und groupId in der Zwischentabelle speichern
+      const mealProducts = productIds.map(productId => ({
+          mealId: mealId,
+          productId: productId,
+          groupId: groupId
+      }));
+      await MealProduct.bulkCreate(mealProducts);
+
+      return meal;
+  } catch (error) {
+      console.error('Error assigning products to meal in group:', error);
   }
 };

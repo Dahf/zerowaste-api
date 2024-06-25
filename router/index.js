@@ -1,6 +1,6 @@
 import express from "express";
-import { verifyToken, verifyTokenAdmin } from "../middleware/VerifyToken.js";
-import { getAllUniqueCategories, getMeal, getMealCombination, getRandomMeals, getTopGenericNames } from "../controllers/Meals.js";
+import { verifyGroupToken, verifyToken, verifyTokenAdmin } from "../middleware/VerifyToken.js";
+import { assignProductsToMealInGroup, getAllUniqueCategories, getMeal, getMealCombination, getRandomMeals, getTopGenericNames } from "../controllers/Meals.js";
 import { Login, Logout, Register } from "../controllers/Users.js";
 import { refreshToken } from "../controllers/RefreshToken.js";
 import { getProductByBarcode, searchProducts } from "../controllers/Products.js";
@@ -45,8 +45,24 @@ router.get('/combination', getMealCombination);
 router.get('/products', getProductByBarcode);
 router.post('/predict', getPrediction);
 
+// Route zum Zuweisen von Produkten zu einem Meal in einer Gruppe
+router.post('/assign-products', verifyGroupToken, async (req, res) => {
+  const { groupId, mealId, productIds } = req.body;
+
+  if (!groupId || !mealId || !productIds) {
+      return res.status(400).json({ error: 'groupId, mealId und productIds müssen angegeben werden' });
+  }
+
+  try {
+      const meal = await assignProductsToMealInGroup(groupId, mealId, productIds);
+      res.json({ message: 'Produkte erfolgreich zugewiesen', meal });
+  } catch (error) {
+      res.status(500).json({ error: 'Fehler beim Zuweisen der Produkte' });
+  }
+});
+
 // Route zum Hinzufügen eines Produkts zu einer Gruppe
-router.post('/group/:groupId/products/:productId', verifyToken, async (req, res) => {
+router.post('/group/:groupId/products/:productId', verifyGroupToken, async (req, res) => {
   const { groupId, productId } = req.params;
   try {
       await addProductToGroup(groupId, productId);
@@ -57,7 +73,7 @@ router.post('/group/:groupId/products/:productId', verifyToken, async (req, res)
 });
 
 // Route zum Hinzufügen eines Meals zu einer Gruppe
-router.post('/group/:groupId/meals/:mealId', verifyToken, async (req, res) => {
+router.post('/group/:groupId/meals/:mealId', verifyGroupToken, async (req, res) => {
   const { groupId, mealId } = req.params;
   try {
       await addMealToGroup(groupId, mealId);
@@ -68,7 +84,7 @@ router.post('/group/:groupId/meals/:mealId', verifyToken, async (req, res) => {
 });
 
 // Route zum Abrufen der Meals einer Gruppe
-router.get('/group/:groupId/meals', verifyToken, async (req, res) => {
+router.get('/group/:groupId/meals', verifyGroupToken, async (req, res) => {
   const { groupId } = req.params;
   try {
       const meals = await getGroupMeals(groupId);
@@ -78,8 +94,8 @@ router.get('/group/:groupId/meals', verifyToken, async (req, res) => {
   }
 });
 
-// Route zum Abrufen der Meals einer Gruppe
-router.get('/group/:groupId/products', verifyToken, async (req, res) => {
+// Route zum Abrufen der Products einer Gruppe
+router.get('/group/:groupId/products', verifyGroupToken, async (req, res) => {
   const { groupId } = req.params;
   try {
       const meals = await getGroupProducts(groupId);
