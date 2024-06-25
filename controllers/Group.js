@@ -51,7 +51,7 @@ export const getGroupMeals = async (groupId) => {
 
         console.log(groupMeals);
 
-        return groupMeals; // Nur die Meals zurückgeben
+        return groupMeals.meals; // Nur die Meals zurückgeben
     } catch (error) {
         console.error('Error fetching group meals:', error);
     }
