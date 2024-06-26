@@ -50,13 +50,13 @@ export const refreshToken = async (req, res) => {
             }
 
             const {
-                kndnr, id: userId, email, rank, vorname, nachname,
+                kndnr, id , email, rank, vorname, nachname,
                 plz, ort, land, geburtstag, phone, anrede, straße,
                 hausnummer, confirmed
             } = user;
 
             const accessToken = jwt.sign(
-                { userId, kndnr, email, rank, vorname, nachname, plz, ort, land, geburtstag, phone, anrede, straße, hausnummer, confirmed },
+                { id, kndnr, email, rank, vorname, nachname, plz, ort, land, geburtstag, phone, anrede, straße, hausnummer, confirmed },
                 process.env.ACCESS_TOKEN_SECRET,
                 { expiresIn: '15m' } // Adjusted from 15s for practical use
             );

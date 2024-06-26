@@ -34,9 +34,7 @@ export const verifyGroupToken = async (req, res, next) => {
         
         // Überprüfen, ob die groupId im Anforderungskörper angegeben ist
         const groupId = req.body.groupId || req.params.groupId;
-        if (!groupId) {
-            return res.status(400).json({ error: 'groupId must be provided.' });
-        }
+        
         if (!groupId) {
             return res.status(400).json({ error: 'groupId must be provided.' });
         }
@@ -44,7 +42,7 @@ export const verifyGroupToken = async (req, res, next) => {
         // Überprüfen, ob der Benutzer Mitglied der angegebenen Gruppe ist
         const userGroup = await UserGroup.findOne({
             where: {
-                userId: req.user.userId,
+                userId: req.user.id,
                 groupId: groupId
             }
         });
