@@ -58,7 +58,7 @@ export const refreshToken = async (req, res) => {
             const accessToken = jwt.sign(
                 { id, kndnr, email, rank, vorname, nachname, plz, ort, land, geburtstag, phone, anrede, straße, hausnummer, confirmed },
                 process.env.ACCESS_TOKEN_SECRET,
-                { expiresIn: '15m' } // Adjusted from 15s for practical use
+                { expiresIn: '15m' } // Adjusted for practical use
             );
             
             res.setHeader('Authorization', `Bearer ${accessToken}`);

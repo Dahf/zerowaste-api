@@ -139,7 +139,7 @@ export const Login = async (req, res) => {
         const refreshToken = jwt.sign(
             { id },
             process.env.REFRESH_TOKEN_SECRET,
-            { expiresIn: '1d' }
+            { expiresIn: '30d' }
         );
 
         await Users.update({ refresh_token: refreshToken }, {
@@ -153,7 +153,7 @@ export const Login = async (req, res) => {
             httpOnly: true, 
             sameSite: 'None',
             path: "/",
-            maxAge: 24 * 60 * 60 * 1000  // 1 day
+            maxAge: 24 * 60 * 60 * 1000 * 30  // 1 day
         });
 
         const userGroup = await UserGroup.findOne({
