@@ -62,7 +62,7 @@ export const refreshToken = async (req, res) => {
             );
             
             res.setHeader('Authorization', `Bearer ${accessToken}`);
-            res.json({ user, accessToken, group });
+            res.json({ user, accessToken, refreshToken, group });
         });
     } catch (error) {
         console.error("Error in refreshToken function:", error);
