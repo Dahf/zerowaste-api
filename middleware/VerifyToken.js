@@ -38,7 +38,7 @@ export const verifyGroupToken = async (req, res, next) => {
         if (!groupId) {
             return res.status(400).json({ error: 'groupId must be provided.' });
         }
-
+        console.log(decoded);
         // Überprüfen, ob der Benutzer Mitglied der angegebenen Gruppe ist
         const userGroup = await UserGroup.findOne({
             where: {
