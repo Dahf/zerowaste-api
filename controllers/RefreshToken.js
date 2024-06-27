@@ -11,6 +11,8 @@ export const refreshToken = async (req, res) => {
             return res.status(401); // Unauthorized
         }
 
+        console.log(refreshToken);
+
         jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, async (err, decoded) => {
             if (err) {
                 console.log("Failed to verify refresh token:", err);
