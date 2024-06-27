@@ -10,45 +10,43 @@ export const refreshToken = async (req, res) => {
             console.log("Refresh token not found in cookies");
             return res.status(401); // Unauthorized
         }
-        console.log(refreshToken);
 
-        const user = await Users.findOne({
-            where: {
-                refresh_token: refreshToken
-            }
-        });
-
-        if (!user) {
-            console.log("No user found with the provided refresh token");
-            return res.status(403).send('No user found with the provided refresh token'); // Forbidden
-        }
-
-        const userGroup = await UserGroup.findOne({
-            where: {
-                userId: user.id
-            }
-        });
-
-        if (!userGroup) {
-            console.log("No group found for the user");
-            return res.status(403).send('No group found for the user'); // Forbidden
-        }
-
-        const group = await Group.findOne({
-            where: {
-                id: userGroup.groupId
-            },
-            include: [{
-                model: Users,
-                through: { attributes: [] } // Verhindert, dass die Zwischentabelle in den Ergebnissen angezeigt wird
-            }]
-        });
-
-        jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, (err, decoded) => {
+        jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, async (err, decoded) => {
             if (err) {
                 console.log("Failed to verify refresh token:", err);
                 return res.status(403).send('Failed to verify refresh token' + err); // Forbidden
             }
+            const user = await Users.findOne({
+                where: {
+                    id: decoded.id
+                }
+            });
+    
+            if (!user) {
+                console.log("No user found with the provided refresh token");
+                return res.status(403).send('No user found with the provided refresh token'); // Forbidden
+            }
+    
+            const userGroup = await UserGroup.findOne({
+                where: {
+                    userId: user.id
+                }
+            });
+    
+            if (!userGroup) {
+                console.log("No group found for the user");
+                return res.status(403).send('No group found for the user'); // Forbidden
+            }
+    
+            const group = await Group.findOne({
+                where: {
+                    id: userGroup.groupId
+                },
+                include: [{
+                    model: Users,
+                    through: { attributes: [] } // Verhindert, dass die Zwischentabelle in den Ergebnissen angezeigt wird
+                }]
+            });
 
             const {
                 kndnr, id , email, rank, vorname, nachname,
