@@ -10,6 +10,7 @@ export const refreshToken = async (req, res) => {
             console.log("Refresh token not found in cookies");
             return res.status(401); // Unauthorized
         }
+        console.log(refreshToken);
 
         const user = await Users.findOne({
             where: {
