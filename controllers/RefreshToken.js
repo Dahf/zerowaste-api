@@ -19,7 +19,7 @@ export const refreshToken = async (req, res) => {
 
         if (!user) {
             console.log("No user found with the provided refresh token");
-            return res.sendStatus(403); // Forbidden
+            return res.sendStatus(403).json({message: 'No user found with the provided refresh token'}); // Forbidden
         }
 
         const userGroup = await UserGroup.findOne({
@@ -30,7 +30,7 @@ export const refreshToken = async (req, res) => {
 
         if (!userGroup) {
             console.log("No group found for the user");
-            return res.sendStatus(403); // Forbidden
+            return res.sendStatus(403).json({message: 'No group found for the user'}); // Forbidden
         }
 
         const group = await Group.findOne({
@@ -46,7 +46,7 @@ export const refreshToken = async (req, res) => {
         jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, (err, decoded) => {
             if (err) {
                 console.log("Failed to verify refresh token:", err);
-                return res.sendStatus(403); // Forbidden
+                return res.sendStatus(403).json({message: 'Failed to verify refresh token' + err}); // Forbidden
             }
 
             const {
