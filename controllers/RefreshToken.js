@@ -8,7 +8,7 @@ export const refreshToken = async (req, res) => {
         const refreshToken = req.cookies.refreshToken;
         if (!refreshToken) {
             console.log("Refresh token not found in cookies");
-            return res.sendStatus(401); // Unauthorized
+            return res.status(401); // Unauthorized
         }
 
         const user = await Users.findOne({
@@ -19,7 +19,7 @@ export const refreshToken = async (req, res) => {
 
         if (!user) {
             console.log("No user found with the provided refresh token");
-            return res.sendStatus(403).send('No user found with the provided refresh token'); // Forbidden
+            return res.status(403).send('No user found with the provided refresh token'); // Forbidden
         }
 
         const userGroup = await UserGroup.findOne({
@@ -30,7 +30,7 @@ export const refreshToken = async (req, res) => {
 
         if (!userGroup) {
             console.log("No group found for the user");
-            return res.sendStatus(403).json('No group found for the user'); // Forbidden
+            return res.status(403).send('No group found for the user'); // Forbidden
         }
 
         const group = await Group.findOne({
@@ -46,7 +46,7 @@ export const refreshToken = async (req, res) => {
         jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, (err, decoded) => {
             if (err) {
                 console.log("Failed to verify refresh token:", err);
-                return res.sendStatus(403).send('Failed to verify refresh token' + err); // Forbidden
+                return res.status(403).send('Failed to verify refresh token' + err); // Forbidden
             }
 
             const {
@@ -61,7 +61,7 @@ export const refreshToken = async (req, res) => {
                 { expiresIn: '15m' } // Adjusted for practical use
             );
             
-            res.json({ user, accessToken, refreshToken, group });
+            return res.json({ user, accessToken, refreshToken, group });
         });
     } catch (error) {
         console.error("Error in refreshToken function:", error);
