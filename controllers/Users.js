@@ -151,9 +151,9 @@ export const Login = async (req, res) => {
         res.cookie('refreshToken', refreshToken, {
             secure: true,
             httpOnly: true, 
-            sameSite: 'None',
+            sameSite: 'Strict',
             path: "/",
-            maxAge: 24 * 60 * 60 * 1000 * 30  // 1 day
+            maxAge: 24 * 60 * 60 * 1000 * 30  // 30 day
         });
 
         const userGroup = await UserGroup.findOne({
@@ -177,7 +177,6 @@ export const Login = async (req, res) => {
             }]
         });
         
-        res.setHeader('Authorization', `Bearer ${accessToken}`);
         res.status(200).json({ user, accessToken, refreshToken, group });
     } catch (error) {
         console.error("Login error:", error);

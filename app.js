@@ -19,7 +19,6 @@ import MealModel from "./models/Meals.js";
 import GroupMeal from "./models/GroupMeal.js";
 import MealProduct from "./models/MealProduct.js";
 
-
 dotenv.config();
 const app = express();
 

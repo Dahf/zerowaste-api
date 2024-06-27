@@ -6,6 +6,7 @@ import jwt from "jsonwebtoken";
 export const refreshToken = async (req, res) => {
     try {
         const refreshToken = req.cookies.refreshToken;
+
         if (!refreshToken) {
             console.log("Refresh token not found in cookies");
             return res.status(401); // Unauthorized
