@@ -8,7 +8,7 @@ export const refreshToken = async (req, res) => {
         const refreshToken = req.cookies.refreshToken;
 
         if (!refreshToken) {
-            console.log("Refresh token not found in cookies");
+            console.log("Refresh token not found in cookies1");
             return res.status(401).send("Refresh token not found in cookies"); // Unauthorized
         }
 
