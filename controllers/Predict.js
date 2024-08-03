@@ -1,4 +1,3 @@
-import supabase from '../config/Database.js';
 import { searchProducts } from './Products.js';
 
 export const getPrediction = async (req, res) => {
@@ -28,10 +27,7 @@ export const getPrediction = async (req, res) => {
                 };
             } catch (error) {
                 console.error(`Error searching for item ${item.item_name}:`, error);
-                return {
-                    ...item,
-                    searchResults: []
-                };
+                
             }
         }));
 

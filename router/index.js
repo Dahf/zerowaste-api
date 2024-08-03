@@ -1,11 +1,11 @@
 import express from "express";
+import { verifyGroupToken, verifyToken, verifyTokenAdmin } from "../middleware/VerifyToken.js";
 import { assignProductsToMealInGroup, getAllUniqueCategories, getMeal, getMealCombination, getRandomMeals, getTopGenericNames } from "../controllers/Meals.js";
 import { Login, Logout, Register } from "../controllers/Users.js";
 import { refreshToken } from "../controllers/RefreshToken.js";
 import { getProductByBarcode, searchProducts } from "../controllers/Products.js";
 import { getPrediction } from "../controllers/Predict.js";
 import { addMealToGroup, addProductToGroup, getGroupMeals, getGroupProducts } from "../controllers/Group.js";
-import verifyGroupMembership from "../auth/token.js";
 
 const router = express.Router();
 
@@ -46,7 +46,7 @@ router.get('/products', getProductByBarcode);
 router.post('/predict', getPrediction);
 
 // Route zum Zuweisen von Produkten zu einem Meal in einer Gruppe
-router.post('/assign-products', verifyGroupMembership, async (req, res) => {
+router.post('/assign-products', verifyGroupToken, async (req, res) => {
   const { groupId, mealId, productIds } = req.body;
 
   if (!groupId || !mealId || !productIds) {
@@ -62,7 +62,7 @@ router.post('/assign-products', verifyGroupMembership, async (req, res) => {
 });
 
 // Route zum Hinzufügen eines Produkts zu einer Gruppe
-router.post('/group/:groupId/products/:productId', verifyGroupMembership, async (req, res) => {
+router.post('/group/:groupId/products/:productId', verifyGroupToken, async (req, res) => {
   const { groupId, productId } = req.params;
   if (!groupId || !productId) {
     return res.status(400).send("groupId und productId müssen angegeben werden.");
@@ -76,7 +76,7 @@ router.post('/group/:groupId/products/:productId', verifyGroupMembership, async 
 });
 
 // Route zum Hinzufügen eines Meals zu einer Gruppe
-router.post('/group/:groupId/meals/:mealId', verifyGroupMembership, async (req, res) => {
+router.post('/group/:groupId/meals/:mealId', verifyGroupToken, async (req, res) => {
   const { groupId, mealId } = req.params;
   if (!groupId || !mealId) {
     return res.status(400).send("groupId und mealId müssen angegeben werden.");
@@ -90,7 +90,7 @@ router.post('/group/:groupId/meals/:mealId', verifyGroupMembership, async (req, 
 });
 
 // Route zum Abrufen der Meals einer Gruppe
-router.get('/group/:groupId/meals', verifyGroupMembership, async (req, res) => {
+router.get('/group/:groupId/meals', verifyGroupToken, async (req, res) => {
   const { groupId } = req.params;
   if (!groupId) {
     return res.status(400).send("groupId muss angegeben werden.");
@@ -104,7 +104,7 @@ router.get('/group/:groupId/meals', verifyGroupMembership, async (req, res) => {
 });
 
 // Route zum Abrufen der Products einer Gruppe
-router.get('/group/:groupId/products', verifyGroupMembership, async (req, res) => {
+router.get('/group/:groupId/products', verifyGroupToken, async (req, res) => {
   const { groupId } = req.params;
   if (!groupId) {
     return res.status(400).send("groupId muss angegeben werden.");

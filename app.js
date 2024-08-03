@@ -1,10 +1,23 @@
 import express from "express";
 import dotenv from "dotenv";
+import Meal from './models/Meals.js'
+import Ingredient from "./models/Ingredient.js";
+import Product from "./models/Products.js";
 import router from "./router/index.js";
+import MealIngredient from "./models/MealIngredients.js";
 import cookieParser from "cookie-parser";
 import cors from "cors";
+import multer from "multer";
+import path from "path";
+import { fileURLToPath } from 'url';
+import fs from 'fs';
+import { verifyTokenAdmin } from "./middleware/VerifyToken.js";
 import bodyParser from "body-parser";
-import supabase from './config/Database.js';
+import GroupProduct from "./models/GroupProduct.js";
+import Group from "./models/Group.js";
+import MealModel from "./models/Meals.js";
+import GroupMeal from "./models/GroupMeal.js";
+import MealProduct from "./models/MealProduct.js";
 
 dotenv.config();
 const app = express();
@@ -22,121 +35,88 @@ app.use(express.json());
 
 app.use(router);
 
-app.post('/meal', async (req, res) => {
-  const file = req.file; // Read file from the request
+const UPLOAD_DIR = 'uploads';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+const uploadPath = path.join(__dirname, UPLOAD_DIR);
+if (!fs.existsSync(uploadPath)) {
+    fs.mkdirSync(uploadPath, { recursive: true });
+}
+
+// Konfigurieren von Multer für Dateiuploads
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, uploadPath); // Verzeichnis, in das die Dateien hochgeladen werden sollen
+    },
+    filename: (req, file, cb) => {
+        cb(null, Date.now() + '-' + file.originalname); // Dateiname
+    },
+});
+
+const upload = multer({ storage: storage });
+
+
+app.use('/uploads', express.static(uploadPath));
+
+app.post('/meal', verifyTokenAdmin, upload.single('image'), async (req, res) => {
+  const file = req.file;
   const body = req.body;
-  
   try {
     if (!file) {
-      return res.status(400).send('Keine Datei hochgeladen');
+        return res.status(400).send('Keine Datei hochgeladen');
     }
-
-    // Upload image to Supabase Storage
-    const { data: uploadData, error: uploadError } = await supabase
-      .storage
-      .from('meal-images') // Ensure you have a bucket named 'meal-images'
-      .upload(`public/${file.originalname}`, file.buffer, {
-        cacheControl: '3600',
-        upsert: false
-      });
-
-    if (uploadError) {
-      throw uploadError;
-    }
-
-    const publicUrl = supabase
-      .storage
-      .from('meal-images')
-      .getPublicUrl(`public/${file.originalname}`).data.publicUrl;
-
+    const publicUrl = `${req.protocol}://silasbeckmann.de/api/uploads/${file.filename}`;
     const formData = {};
     for (const key in body) {
-      formData[key] = body[key];
+        formData[key] = body[key];
     }
-
     let categoryString = "";
     if (Array.isArray(formData.category)) {
       categoryString = formData.category.find(cat => cat !== "") || "";
     } else {
-      categoryString = formData.category;
+      categoryString = category;
+    }
+    const meal = await Meal.create({
+      name: formData.name,
+      category: categoryString,
+      description: formData.description,
+      servingSize: formData.servingSize,
+      calories: formData.calories,
+      fat: formData.fat,
+      carbohydrates: formData.carbohydrates,
+      protein: formData.protein,
+      energy: formData.energy,
+      sugar: formData.sugar,
+      sodium: formData.sodium,
+      image: publicUrl
+    });
+    
+    if (Array.isArray(JSON.parse(formData.ingredients)) && JSON.parse(formData.ingredients).length > 0) {
+      try {
+        const ingredientPromises = JSON.parse(formData.ingredients).map(async (ingredient) => {
+          const ing = await Ingredient.create({ name: ingredient.name, measure: ingredient.measure, quantity: ingredient.quantity });
+          return meal.addIngredient(ing);
+        });
+    
+        await Promise.all(ingredientPromises);
+      } catch (error) {
+        console.error('Error processing ingredients:', error);
+      }
+    } else {
+      console.log('No ingredients found or ingredients is not an array.');
     }
 
-    // Insert the meal into the database
-    const { data: mealData, error: mealError } = await supabase
-      .from('meals')
-      .insert([{
-        name: formData.name,
-        category: categoryString,
-        description: formData.description,
-        servingSize: formData.servingSize,
-        calories: formData.calories,
-        fat: formData.fat,
-        carbohydrates: formData.carbohydrates,
-        protein: formData.protein,
-        energy: formData.energy,
-        sugar: formData.sugar,
-        sodium: formData.sodium,
-        image: publicUrl
-      }])
-      .single();
-
-    if (mealError) {
-      throw mealError;
-    }
-
-    const mealId = mealData.id;
-
-    // Insert ingredients if they exist
-    const ingredients = JSON.parse(formData.ingredients);
-    if (Array.isArray(ingredients) && ingredients.length > 0) {
-      const ingredientPromises = ingredients.map(async (ingredient) => {
-        const { data: ingredientData, error: ingredientError } = await supabase
-          .from('ingredients')
-          .insert([{
-            name: ingredient.name,
-            measure: ingredient.measure,
-            quantity: ingredient.quantity
-          }])
-          .single();
-
-        if (ingredientError) {
-          throw ingredientError;
+    const result = await Meal.findByPk(meal.id, {
+      include: {
+        model: Ingredient,
+        through: {
+          model: MealIngredient
         }
-
-        const ingredientId = ingredientData.id;
-
-        // Insert into MealIngredient
-        const { data: mealIngredientData, error: mealIngredientError } = await supabase
-          .from('meal_ingredients')
-          .insert([{
-            mealId,
-            ingredientId
-          }]);
-
-        if (mealIngredientError) {
-          throw mealIngredientError;
-        }
-      });
-
-      await Promise.all(ingredientPromises);
-    }
-
-    // Fetch the meal with its ingredients
-    const { data: result, error: fetchError } = await supabase
-      .from('meals')
-      .select(`
-        *,
-        ingredients (
-          *
-        )
-      `)
-      .eq('id', mealId)
-      .single();
-
-    if (fetchError) {
-      throw fetchError;
-    }
-
+      }
+    });
+    
     res.status(200).json(result);
   } catch (error) {
     console.error('Error creating meal:', error);
@@ -144,6 +124,35 @@ app.post('/meal', async (req, res) => {
   }
 });
 
+
+Meal.belongsToMany(Ingredient, { 
+  through: MealIngredient,
+  uniqueKey: 'id',
+  foreignKey: 'mealId',
+  otherKey: 'ingredientId',
+});
+Meal.belongsToMany(Ingredient, { 
+  through: MealIngredient,
+  uniqueKey: 'id',
+  foreignKey: 'mealId',
+  otherKey: 'ingredientId',
+  as: 'tagFilter'
+});
+
+Ingredient.belongsToMany(Meal, { through: MealIngredient });
+
+
+Group.belongsToMany(Product, { through: GroupProduct });
+Product.belongsToMany(Group, { through: GroupProduct });
+
+Group.belongsToMany(MealModel, { through: GroupMeal });
+MealModel.belongsToMany(Group, { through: GroupMeal });
+
+MealModel.belongsToMany(Product, { through: MealProduct });
+Product.belongsToMany(MealModel, { through: MealProduct });
+
+Group.hasMany(MealProduct, { foreignKey: 'groupId' });
+MealProduct.belongsTo(Group, { foreignKey: 'groupId' });
 
 const PORT = process.env.PORT || 8088;
 
