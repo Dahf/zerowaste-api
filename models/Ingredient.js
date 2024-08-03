@@ -22,7 +22,8 @@ const IngredientModel = db.define('ingredient',{
     allowNull: false
   }
 },{
-  freezeTableName:true
+  freezeTableName:true,
+  schema: 'public',
 });
 
 (async () => {

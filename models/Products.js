@@ -233,7 +233,8 @@ const Product = db.define('products', {
   tsv: { type: DataTypes.TSVECTOR, allowNull: true } 
 }, {
   freezeTableName: true,
-  timestamps: false
+  timestamps: false,
+  schema: 'public',
 });
 
 (async () => {

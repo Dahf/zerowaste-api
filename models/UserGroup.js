@@ -21,7 +21,8 @@ const UserGroup = db.define('user_groups', {
     }
   }
 }, {
-  freezeTableName: true
+  freezeTableName: true,
+  schema: 'public',
 });
 
 User.belongsToMany(Group, { through: UserGroup });

@@ -58,7 +58,8 @@ const MealModel = db.define('meals',{
     allowNull: true
   },
 },{
-  freezeTableName:true
+  freezeTableName:true,
+  schema: 'public',
 });
 
 (async () => {

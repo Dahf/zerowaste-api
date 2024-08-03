@@ -44,7 +44,8 @@ const Users = db.define('users', {
         allowNull: true, 
     }
 },{
-    freezeTableName:true
+    freezeTableName:true,
+    schema: 'public',
 });
  
 (async () => {

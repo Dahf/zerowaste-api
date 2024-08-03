@@ -28,7 +28,8 @@ const MealProduct = db.define('MealProduct', {
     }
   }
 }, {
-  freezeTableName: true
+  freezeTableName: true,
+  schema: 'public',
 });
 
 export default MealProduct;

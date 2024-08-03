@@ -21,7 +21,8 @@ const GroupMeal = db.define('group_meals', {
     }
   }
 }, {
-  freezeTableName: true
+  freezeTableName: true,
+  schema: 'public',
 });
 
 export default GroupMeal;

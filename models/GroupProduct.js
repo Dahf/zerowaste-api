@@ -21,7 +21,8 @@ const GroupProduct = db.define('group_products', {
     }
   }
 }, {
-  freezeTableName: true
+  freezeTableName: true,
+  schema: 'public',
 });
 
 export default GroupProduct;
