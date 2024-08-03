@@ -154,9 +154,7 @@ Product.belongsToMany(MealModel, { through: MealProduct });
 Group.hasMany(MealProduct, { foreignKey: 'groupId' });
 MealProduct.belongsTo(Group, { foreignKey: 'groupId' });
 
-
 const PORT = process.env.PORT || 8088;
-
 
 app.listen(PORT, () => {
     console.log("Server Listening on PORT:", PORT);
