@@ -1,6 +1,4 @@
-import Product from "../models/Products.js";
-import { Op, Sequelize } from 'sequelize';
-import re from 're';
+import supabase from '../config/Database.js'; // Import the Supabase client
 
 function getImageUrl(productData, baseName, resolution = 'full') {
     if (!productData.images) {
@@ -32,23 +30,24 @@ function getImageUrl(productData, baseName, resolution = 'full') {
     return `${baseUrl}/${folderName}/${filename}`;
 }
 
-
-
 export const getProductByBarcode = async (req, res) => {
     const { barcode } = req.query;
     try {
-        const product = await Product.findOne({
-            where: {
-                _id: barcode
-            }
-        });
+        const { data: product, error } = await supabase
+            .from('products')
+            .select('*')
+            .eq('_id', barcode)
+            .single();
+
+        if (error) {
+            throw error;
+        }
 
         if (product) {
-            const productData = product.toJSON(); // Assuming `product` is a Sequelize instance
-            productData.imageFrontUrl = getImageUrl(productData, 'front');
-            productData.imageIngredientsUrl = getImageUrl(productData, 'ingredients');
-            productData.imageNutritionUrl = getImageUrl(productData, 'nutrition');
-            res.json(productData);
+            product.imageFrontUrl = getImageUrl(product, 'front');
+            product.imageIngredientsUrl = getImageUrl(product, 'ingredients');
+            product.imageNutritionUrl = getImageUrl(product, 'nutrition');
+            res.json(product);
         } else {
             res.status(404).json({ error: 'Product not found' });
         }
@@ -60,18 +59,25 @@ export const getProductByBarcode = async (req, res) => {
 
 export const searchProducts = async (searchQuery, limit = 10) => {
     try {
-        const products = await Product.findAll({
-            where: Sequelize.literal(`tsv @@ plainto_tsquery('simple', '${searchQuery}')`),
-            limit: limit,
-            order: [['completeness', 'DESC']]
-        });
+        const { data: products, error } = await supabase
+            .from('products')
+            .select('*')
+            .textSearch('tsv', searchQuery, {
+                type: 'plain',
+                config: 'simple'
+            })
+            .limit(limit)
+            .order('completeness', { ascending: false });
+
+        if (error) {
+            throw error;
+        }
 
         const productsWithImages = products.map(product => {
-            const productData = product.toJSON(); // Assuming `product` is a Sequelize instance
-            productData.imageFrontUrl = getImageUrl(productData, 'front');
-            productData.imageIngredientsUrl = getImageUrl(productData, 'ingredients');
-            productData.imageNutritionUrl = getImageUrl(productData, 'nutrition');
-            return productData;
+            product.imageFrontUrl = getImageUrl(product, 'front');
+            product.imageIngredientsUrl = getImageUrl(product, 'ingredients');
+            product.imageNutritionUrl = getImageUrl(product, 'nutrition');
+            return product;
         });
 
         return productsWithImages;

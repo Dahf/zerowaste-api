@@ -1,19 +1,38 @@
-import Group from '../models/Group.js';
-import Product from '../models/Products.js';
-import GroupProduct from '../models/GroupProduct.js';
-import MealModel from '../models/Meals.js';
-import GroupMeal from '../models/GroupMeal.js';
+import supabase from '../config/Database.js'; 
 
 export const addProductToGroup = async (groupId, productId) => {
     try {
-        const group = await Group.findByPk(groupId);
-        const product = await Product.findByPk(productId);
-
-        if (!group || !product) {
-            throw new Error('Group or Product not found');
+        // Check if group exists
+        const { data: group, error: groupError } = await supabase
+            .from('groups')
+            .select('*')
+            .eq('id', groupId)
+            .single();
+        
+        if (groupError || !group) {
+            throw new Error('Group not found');
         }
 
-        await GroupProduct.create({ groupId, productId });
+        // Check if product exists
+        const { data: product, error: productError } = await supabase
+            .from('products')
+            .select('*')
+            .eq('_id', productId)
+            .single();
+        
+        if (productError || !product) {
+            throw new Error('Product not found');
+        }
+
+        // Insert into group_products
+        const { error: insertError } = await supabase
+            .from('group_products')
+            .insert([{ groupId, productId }]);
+        
+        if (insertError) {
+            throw insertError;
+        }
+
         console.log(`Product ${productId} added to Group ${groupId}`);
     } catch (error) {
         console.error('Error adding product to group:', error);
@@ -22,14 +41,37 @@ export const addProductToGroup = async (groupId, productId) => {
 
 export const addMealToGroup = async (groupId, mealId) => {
     try {
-        const group = await Group.findByPk(groupId);
-        const meal = await MealModel.findByPk(mealId);
-
-        if (!group || !meal) {
-            throw new Error('Group or Meal not found');
+        // Check if group exists
+        const { data: group, error: groupError } = await supabase
+            .from('groups')
+            .select('*')
+            .eq('id', groupId)
+            .single();
+        
+        if (groupError || !group) {
+            throw new Error('Group not found');
         }
 
-        await GroupMeal.create({ groupId, mealId });
+        // Check if meal exists
+        const { data: meal, error: mealError } = await supabase
+            .from('meals')
+            .select('*')
+            .eq('id', mealId)
+            .single();
+        
+        if (mealError || !meal) {
+            throw new Error('Meal not found');
+        }
+
+        // Insert into group_meals
+        const { error: insertError } = await supabase
+            .from('group_meals')
+            .insert([{ groupId, mealId }]);
+        
+        if (insertError) {
+            throw insertError;
+        }
+
         console.log(`Meal ${mealId} added to Group ${groupId}`);
     } catch (error) {
         console.error('Error adding meal to group:', error);
@@ -38,18 +80,17 @@ export const addMealToGroup = async (groupId, mealId) => {
 
 export const getGroupMeals = async (groupId) => {
     try {
-        const groupMeals = await Group.findByPk(groupId, {
-            include: [
-                { model: MealModel, through: { attributes: [] }, attributes: { exclude: [] } } // Alle Felder des Meal-Modells
-            ],
-            attributes: [] // Keine Gruppeninformationen zurückgeben
-        });
-
-        if (!groupMeals) {
-            throw new Error('Group not found');
+        // Fetch group meals
+        const { data: groupMeals, error } = await supabase
+            .from('group_meals')
+            .select('meals(*)')
+            .eq('groupId', groupId);
+        
+        if (error) {
+            throw error;
         }
 
-        return groupMeals.meals; // Nur die Meals zurückgeben
+        return groupMeals.map(groupMeal => groupMeal.meals);
     } catch (error) {
         console.error('Error fetching group meals:', error);
     }
@@ -57,20 +98,20 @@ export const getGroupMeals = async (groupId) => {
 
 export const getGroupProducts = async (groupId) => {
     try {
-        const groupProducts = await Group.findByPk(groupId, {
-            include: [
-                { model: Product, through: { attributes: [] }, attributes: { exclude: [] } } // Alle Felder des Produkt-Modells
-            ],
-            attributes: [] // Keine Gruppeninformationen zurückgeben
-        });
+        // Fetch group products
+        const { data: groupProducts, error } = await supabase
+            .from('group_products')
+            .select('products(*)')
+            .eq('groupId', groupId);
 
-        if (!groupProducts) {
-            throw new Error('Group not found');
+        if (error) {
+            throw error;
         }
 
-        const products = groupProducts.products.map(product => {
+        const products = groupProducts.map(groupProduct => {
+            const product = groupProduct.products;
             return {
-                ...product.toJSON(),
+                ...product,
                 imageFrontUrl: getImageUrl(product, 'front'),
                 imageIngredientsUrl: getImageUrl(product, 'ingredients'),
                 imageNutritionUrl: getImageUrl(product, 'nutrition')
