@@ -16,7 +16,7 @@ services:
     environment:
       ACCESS_TOKEN_SECRET: ${ACCESS_TOKEN_SECRET}
       REFRESH_TOKEN_SECRET: ${REFRESH_TOKEN_SECRET}
-      DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-changeme}@postgres:5432/${POSTGRES_DB:-postgres}
+      DATABASE_URL: postgresql://postgres:your-super-secret-and-long-postgres-password@supabase-db:54432/$postgres
       KEY: ${KEY}
       TRANSLATE_API_KEY: ${TRANSLATE_API_KEY}
     stdin_open: true
