@@ -5,7 +5,7 @@ import Product from "./Products.js";
 import MealModel from "./Meals.js";
 const { DataTypes } = Sequelize;
 
-const MealProduct = db.define('MealProduct', {
+const MealProduct = db.define('mealproduct', {
   mealId: {
     type: DataTypes.INTEGER,
     references: {
