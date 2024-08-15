@@ -22,6 +22,7 @@ const MealIngredient = db.define('mealingredient', {
 }, {
   freezeTableName: true,
   schema: 'public',
+  timestamps: false,
 });
 (async () => {
   await db.sync();

@@ -59,6 +59,7 @@ const MealModel = db.define('meals',{
   },
 },{
   freezeTableName:true,
+  timestamps: false,
   schema: 'public',
 });
 

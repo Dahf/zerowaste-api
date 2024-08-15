@@ -16,6 +16,7 @@ const Group = db.define('groups', {
 }, {
   freezeTableName: true,
   schema: 'public',
+  timestamps: false,
 });
 
 (async () => {

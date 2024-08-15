@@ -22,6 +22,7 @@ const UserGroup = db.define('user_groups', {
   }
 }, {
   freezeTableName: true,
+  timestamps: false,
   schema: 'public',
 });
 

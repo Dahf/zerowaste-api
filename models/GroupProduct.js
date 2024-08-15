@@ -23,6 +23,7 @@ const GroupProduct = db.define('group_products', {
 }, {
   freezeTableName: true,
   schema: 'public',
+  timestamps: false,
 });
 
 export default GroupProduct;

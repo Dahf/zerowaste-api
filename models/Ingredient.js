@@ -24,6 +24,7 @@ const IngredientModel = db.define('ingredient',{
 },{
   freezeTableName:true,
   schema: 'public',
+  timestamps: false,
 });
 
 (async () => {

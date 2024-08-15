@@ -29,6 +29,7 @@ const MealProduct = db.define('mealproduct', {
   }
 }, {
   freezeTableName: true,
+  timestamps: false,
   schema: 'public',
 });
 

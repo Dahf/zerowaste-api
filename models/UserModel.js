@@ -45,6 +45,7 @@ const Users = db.define('webusers', {
     }
 },{
     freezeTableName:true,
+    timestamps: false,
     schema: 'public',
 });
  
