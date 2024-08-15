@@ -6,21 +6,21 @@ import MealModel from "./Meals.js";
 const { DataTypes } = Sequelize;
 
 const MealProduct = db.define('mealproduct', {
-  mealId: {
+  mealid: {
     type: DataTypes.INTEGER,
     references: {
       model: MealModel,
       key: 'id'
     }
   },
-  productId: {
+  productid: {
     type: DataTypes.INTEGER,
     references: {
       model: Product,
       key: 'id'
     }
   },
-  groupId: {
+  groupid: {
     type: DataTypes.INTEGER,
     references: {
       model: Group,

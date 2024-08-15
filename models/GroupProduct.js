@@ -6,14 +6,14 @@ import Product from './Products.js';
 const { DataTypes } = Sequelize;
 
 const GroupProduct = db.define('group_products', {
-  groupId: {
+  groupid: {
     type: DataTypes.INTEGER,
     references: {
       model: Group,
       key: 'id'
     }
   },
-  productId: {
+  productid: {
     type: DataTypes.INTEGER,
     references: {
       model: Product,

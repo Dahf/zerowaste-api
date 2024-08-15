@@ -128,14 +128,14 @@ app.post('/meal', verifyTokenAdmin, upload.single('image'), async (req, res) => 
 Meal.belongsToMany(Ingredient, { 
   through: MealIngredient,
   uniqueKey: 'id',
-  foreignKey: 'mealId',
-  otherKey: 'ingredientId',
+  foreignKey: 'mealid',
+  otherKey: 'ingredientid',
 });
 Meal.belongsToMany(Ingredient, { 
   through: MealIngredient,
   uniqueKey: 'id',
-  foreignKey: 'mealId',
-  otherKey: 'ingredientId',
+  foreignKey: 'mealid',
+  otherKey: 'ingredientid',
   as: 'tagFilter'
 });
 
@@ -151,8 +151,8 @@ MealModel.belongsToMany(Group, { through: GroupMeal });
 MealModel.belongsToMany(Product, { through: MealProduct });
 Product.belongsToMany(MealModel, { through: MealProduct });
 
-Group.hasMany(MealProduct, { foreignKey: 'groupId' });
-MealProduct.belongsTo(Group, { foreignKey: 'groupId' });
+Group.hasMany(MealProduct, { foreignKey: 'groupid' });
+MealProduct.belongsTo(Group, { foreignKey: 'groupid' });
 
 const PORT = process.env.PORT || 8088;
 

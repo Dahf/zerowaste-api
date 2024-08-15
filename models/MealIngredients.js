@@ -5,14 +5,14 @@ import Ingredient from "./Ingredient.js";
 import Meal from "./Meals.js";
 
 const MealIngredient = db.define('mealingredient', {
-  mealId: {
+  mealid: {
       type: DataTypes.INTEGER,
       references: {
           model: Meal,
           key: 'id'
       }
   },
-  ingredientId: {
+  ingredientid: {
       type: DataTypes.INTEGER,
       references: {
           model: Ingredient,

@@ -6,14 +6,14 @@ import Group from './Group.js';
 const { DataTypes } = Sequelize;
 
 const UserGroup = db.define('user_groups', {
-  userId: {
+  userid: {
     type: DataTypes.INTEGER,
     references: {
       model: User,
       key: 'id'
     }
   },
-  groupId: {
+  groupid: {
     type: DataTypes.INTEGER,
     references: {
       model: Group,
@@ -28,8 +28,8 @@ const UserGroup = db.define('user_groups', {
 User.belongsToMany(Group, { through: UserGroup });
 Group.belongsToMany(User, { through: UserGroup });
 
-User.hasMany(UserGroup, { foreignKey: 'userId' });
-UserGroup.belongsTo(Group, { foreignKey: 'groupId' });
+User.hasMany(UserGroup, { foreignKey: 'userid' });
+UserGroup.belongsTo(Group, { foreignKey: 'groupid' });
 
 
 (async () => {
